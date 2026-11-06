@@ -10,7 +10,7 @@
 .plan-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.plan-tools label{display:flex;align-items:center;gap:8px;margin:0;font-size:12px;color:var(--muted)}select{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:7px 10px;background:#fffefa}.direction-switch{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}.direction-switch button{min-width:100px}.layout.is-list{grid-template-columns:minmax(0,1fr)}.layout.is-list>section>.section-head{grid-column:1/-1}.layout.is-list #today-preview{grid-column:1/-1}#library-view{margin-top:16px}.layout:not(.is-list) #undo-review{grid-row:1}.layout:not(.is-list) .direction-switch{grid-column:1/-1}
 @media(max-width:640px){.direction-switch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%}.direction-switch button{min-width:0;padding:10px 2px;font-size:12px}.plan-tools{gap:8px}.layout:not(.is-list) #undo-review{grid-row:1} .plan-tools label{font-size:11px}}
 
-.card{cursor:default}#ratings button[data-grade="good"]{background:var(--lime);border-color:var(--lime)}#ratings button[data-grade="again"]{background:#fffefa;border-color:var(--line)}
+.card{cursor:default;border-radius:9px}#ratings button[data-grade="good"]{background:var(--lime);border-color:var(--lime)}#ratings button[data-grade="again"]{background:#fffefa;border-color:var(--line)}
 </style></head><body>
 <header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
 <main><div id="storage-warning" class="notice" role="alert" hidden></div>
