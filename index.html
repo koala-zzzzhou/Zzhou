@@ -507,7 +507,7 @@ const PHONETIC_KEY='wordwell.phonetics.us.v2',US_IPA_CACHE='wordwell-us-ipa-'+US
 let phoneticCache=new Map(),phoneticToken=0,phoneticWord='',usLexiconPromise=null;
 function completeUSIPA(value){return typeof value==='string'&&value.length<=200&&/^\/[^/]+\/$/u.test(value)&&!/[\-…]/u.test(value);}
 try{const data=JSON.parse(localStorage.getItem(PHONETIC_KEY)||'[]');if(Array.isArray(data))for(const pair of data.slice(-500)){if(Array.isArray(pair)&&pair.length===2&&typeof pair[0]==='string'&&pair[1]?.revision===US_IPA_REV&&Array.isArray(pair[1].values)&&pair[1].values.length>0&&pair[1].values.length<=12&&pair[1].values.every(completeUSIPA))phoneticCache.set(pair[0],pair[1]);}}catch(e){}
-function usPhoneticCredit(){const area=element('div','lookup-credit');area.append(document.createTextNode('美式英语 · '));for(const [label,url] of [['ipa-dict / en_US','https://github.com/open-dict-data/ipa-dict/blob/'+US_IPA_REV+'/data/en_US.txt'],['MIT','https://github.com/open-dict-data/ipa-dict/blob/'+US_IPA_REV+'/LICENSE']]){const a=element('a','',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';area.append(a,document.createTextNode(' · '));}return area;}
+function usPhoneticCredit(){const area=element('div','lookup-credit');area.append(document.createTextNode('美式英语 · 常见词典写法 · '));for(const [label,url] of [['ipa-dict / en_US','https://github.com/open-dict-data/ipa-dict/blob/'+US_IPA_REV+'/data/en_US.txt'],['MIT','https://github.com/open-dict-data/ipa-dict/blob/'+US_IPA_REV+'/LICENSE']]){const a=element('a','',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';area.append(a,document.createTextNode(' · '));}return area;}
 function parseUSLexicon(text){const map=new Map();for(const line of text.split('\n')){const tab=line.indexOf('\t');if(tab<1)continue;const key=line.slice(0,tab).trim().toLowerCase(),values=[...new Set(line.slice(tab+1).trim().split(/,\s*/).filter(completeUSIPA))];if(values.length)map.set(key,values);}if(map.size<1000)throw Error('词表不完整');return map;}
 async function loadUSLexicon(){
  if(usLexiconPromise)return usLexiconPromise;
@@ -518,7 +518,10 @@ async function loadUSLexicon(){
  })();
  try{return await usLexiconPromise;}catch(e){usLexiconPromise=null;throw e;}
 }
-function showPhoneticValues(values,cached=false){const area=$('phonetic-result');area.replaceChildren();for(const value of values)area.append(element('div','phonetic-value',value));if(cached)area.append(element('div','phonetic-cached','本机缓存'));}
+// Display conventional learner-dictionary symbols; keep the source IPA unchanged in cache.
+// Retain schwa, stress, diphthongs, syllable structure and pronunciation alternatives.
+function learnerIPA(value){return value.replace(/ɹ/g,'r').replace(/ɫ/g,'l').replace(/ɝ/g,'ɜːr').replace(/ɚ/g,'ər').replace(/ɑ(?![ːɪʊ])/g,'ɑː').replace(/ɔ(?![ːɪ])/g,'ɔː');}
+function showPhoneticValues(values,cached=false){const area=$('phonetic-result');area.replaceChildren();for(const value of new Set(values.map(learnerIPA)))area.append(element('div','phonetic-value',value));if(cached)area.append(element('div','phonetic-cached','本机缓存'));}
 async function openPhonetic(word,force=false){
  cancelMarkPress();const token=++phoneticToken;phoneticWord=word;$('phonetic-title').textContent=word;$('phonetic-result').textContent='正在查询美式音标…';$('phonetic-source').replaceChildren(usPhoneticCredit());$('phonetic-retry').hidden=true;
  if(!$('phonetic-dialog').open)$('phonetic-dialog').showModal();
