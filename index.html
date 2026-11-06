@@ -20,6 +20,8 @@
 .markable{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-y}.red-mark{background:#ffd0d0;color:#792626;border-radius:2px;padding:0;font:inherit}
 
 .ocr-area{margin:16px 0}.ocr-picker{position:relative;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--line);border-radius:8px;padding:11px 18px;background:var(--lime);color:var(--ink);font-size:13px;cursor:pointer;margin:0}.ocr-picker input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.ocr-picker:focus-within{outline:3px solid #a4be78;outline-offset:3px}.ocr-picker:has(input:disabled){opacity:.45;cursor:wait}.ocr-area progress{width:100%;margin-top:14px;accent-color:var(--green)}.ocr-area p{font-size:12px;margin:8px 0;white-space:pre-wrap}.ocr-area button{font-size:12px;padding:7px 12px}
+
+.markable{touch-action:manipulation}#phonetic-dialog{width:min(420px,calc(100% - 30px))}#phonetic-title{font-size:27px;overflow-wrap:anywhere}#phonetic-result{padding:18px 0;font-size:14px}.phonetic-value{font-size:25px;line-height:1.7;overflow-wrap:anywhere}.phonetic-cached{font-size:11px;color:var(--muted);margin-top:8px}#phonetic-retry{margin-bottom:10px}
 </style></head><body>
 <header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
 <main><div id="storage-warning" class="notice" role="alert" hidden></div>
@@ -30,6 +32,7 @@
 <dialog id="single-dialog" aria-labelledby="single-title"><div class="dialog-header"><h2 id="single-title">单个导入</h2><button id="single-close" type="button" aria-label="关闭">×</button></div><form class="side" id="add-form"><label for="word">英文</label><input id="word" required maxlength="120" autocomplete="off"><button id="lookup" class="lookup-button" type="button">查释义与例句</button><p id="lookup-status" role="status"></p><div id="lookup-preview" class="lookup-preview"></div><label for="definition">中文</label><textarea id="definition" required maxlength="2000"></textarea><label for="examples">例句</label><textarea id="examples" maxlength="4000"></textarea><div id="example-credit" hidden></div><label for="tags">单元 / 分类</label><input id="tags" maxlength="200"><button class="solid" type="submit">保存</button></form></dialog>
 <dialog id="backup-dialog" aria-labelledby="backup-title"><div class="dialog-header"><h2 id="backup-title">批量导入</h2><button id="backup-close" type="button" aria-label="关闭">×</button></div><div id="bulk-unit-area"><label for="bulk-unit">单元 / 分类</label><input id="bulk-unit" maxlength="200"></div><div id="backup-file-area"><label for="backup-file">文件</label><input id="backup-file" type="file" accept=".json,.txt,.tsv,.csv,application/json,text/plain"></div><div class="ocr-area" id="word-ocr-area"><label class="ocr-picker">图片识别<input id="word-ocr-file" type="file" accept="image/*" multiple aria-label="选择单词截图"></label><div id="word-ocr-panel" hidden><progress id="word-ocr-progress" max="1" value="0" aria-label="图片识别进度"></progress><p id="word-ocr-status" role="status" aria-live="polite"></p><button id="word-ocr-cancel" type="button">取消识别</button></div></div><label for="backup-text">内容</label><textarea id="backup-text" spellcheck="false" placeholder="英文&#9;中文"></textarea><p id="backup-status" role="status" aria-live="polite"></p><div class="backup-actions"><a id="backup-download" download="wordwell-backup.json">下载 JSON</a><button id="backup-copy">复制</button><button id="backup-merge" class="solid">导入</button></div></dialog>
 <dialog id="speaking-dialog" aria-labelledby="speaking-dialog-title"><div class="dialog-header"><h2 id="speaking-dialog-title">导入 Part 1 口语</h2><button id="speaking-close" type="button" aria-label="关闭口语导入">×</button></div><div class="speaking-import-modes" role="group" aria-label="口语导入方式"><button id="speaking-manual-tab" type="button" aria-pressed="true">填写导入</button><button id="speaking-text-tab" type="button" aria-pressed="false">文本 / 图片导入</button></div><form id="speaking-form"><label for="speaking-topic">题型</label><input id="speaking-topic" required maxlength="120"><label for="speaking-question">问题</label><textarea id="speaking-question" required maxlength="2000"></textarea><label for="speaking-answer">答案</label><textarea id="speaking-answer" required maxlength="20000"></textarea><button type="submit" class="solid speaking-submit">保存口语</button></form><div id="speaking-batch" hidden><label for="speaking-file">口语文件</label><input id="speaking-file" type="file" accept=".json,.txt,.md,text/plain,application/json"><div class="ocr-area"><label class="ocr-picker">图片识别<input id="speaking-ocr-file" type="file" accept="image/*" multiple aria-label="选择口语截图"></label><label for="speaking-ocr-topic">截图题型</label><input id="speaking-ocr-topic" maxlength="120" placeholder="截图没有题型时，可填写"><div id="speaking-ocr-panel" hidden><progress id="speaking-ocr-progress" max="1" value="0" aria-label="口语图片识别进度"></progress><p id="speaking-ocr-status" role="status" aria-live="polite"></p><button id="speaking-ocr-cancel" type="button">取消识别</button></div></div><label for="speaking-text">口语文本 / JSON</label><textarea id="speaking-text" placeholder="题型：opportunity&#10;## Did you have any opportunities to take part in new activities as a child?&#10;回答：Your answer..."></textarea><button id="speaking-batch-save" class="solid speaking-submit" type="button">导入口语</button></div><p id="speaking-status" role="status" aria-live="polite"></p></dialog>
+<dialog id="phonetic-dialog" aria-labelledby="phonetic-title"><div class="dialog-header"><h2 id="phonetic-title"></h2><button id="phonetic-close" type="button" aria-label="关闭音标">×</button></div><div id="phonetic-result" role="status" aria-live="polite"></div><button id="phonetic-retry" type="button" hidden>重试</button><div id="phonetic-source" class="lookup-credit"></div></dialog>
 <div id="toast" role="status" aria-live="polite"></div><script id="offline-seed" type="application/json">[]</script><script>
 
 'use strict';
@@ -145,7 +148,7 @@ function renderCard(){
 }
 function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const filtered=words.filter(w=>[w.word,w.definition,groupName(w)].join(' ').toLocaleLowerCase().includes(query));$('shown').textContent=filtered.length+' 词';groupRows(filtered,$('list'),true);}
 function render(){todayWords();$('total').textContent=words.length;$('due-count').textContent=visibleQueue('review').length;$('learned').textContent=words.filter(w=>w.mastered).length;renderCard();renderList();}
-function setDirection(value){clearUndoFeedback();direction=value;flipped=false;pendingGrade=null;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
+function setDirection(value){cancelMarkPress();clearUndoFeedback();direction=value;flipped=false;pendingGrade=null;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
 $('en-zh').onclick=()=>setDirection('en-zh');$('zh-en').onclick=()=>setDirection('zh-en');$('tab-review').onclick=()=>setDirection('review');$('tab-library').onclick=()=>setDirection('library');$('tab-speaking').onclick=()=>setDirection('speaking');
 
 function normalizeSchedule(w){if(w.scheduleVersion===2)return;w.stage=[0,1,2,4,4,6,8,9][Math.min(7,w.stage)];w.scheduleVersion=2;}
@@ -435,7 +438,7 @@ $('backup-dialog').addEventListener('close',()=>cancelOcr('word'));
 $('speaking-dialog').addEventListener('close',()=>cancelOcr('speaking'));
 
 const MARKS_KEY='wordwell.red-marks.v1';
-let redMarks=new Map(),marksStorageOK=true,press=null,pressTimer;
+let redMarks=new Map(),marksStorageOK=true,press=null,pressTimer,lastWordTap=null;
 function markKey(type,id,field){return JSON.stringify([type,id,field]);}
 function validMarkRecord(record){return record&&typeof record.text==='string'&&Array.isArray(record.ranges)&&record.ranges.length<=2000&&record.ranges.every(r=>Number.isInteger(r.start)&&Number.isInteger(r.end)&&r.start>=0&&r.end>r.start&&r.end<=record.text.length);}
 function readMarks(){try{const raw=localStorage.getItem(MARKS_KEY);if(raw===null){redMarks=new Map();marksStorageOK=true;return;}const data=JSON.parse(raw);if(!Array.isArray(data)||!data.every(pair=>Array.isArray(pair)&&pair.length===2&&typeof pair[0]==='string'&&validMarkRecord(pair[1])))throw Error();redMarks=new Map(data);marksStorageOK=true;}catch(e){marksStorageOK=false;toast('红底标记读取失败，原数据未覆盖');}}
@@ -466,23 +469,59 @@ function toggleRedMark(node,start,end){
  if(merged.length)redMarks.set(key,{text,ranges:merged});else redMarks.delete(key);saveMarks();
  for(const target of document.querySelectorAll('[data-mark-key]'))if(target.dataset.markKey===key&&target.dataset.markText===text)paintMarkedText(target,key,text);
 }
-function markAtPoint(node,x,y){
+function tokenAtPoint(node,x,y){
  let caret=document.caretPositionFromPoint?.(x,y),range;
  if(caret){range=document.createRange();range.setStart(caret.offsetNode,caret.offset);range.collapse(true);}else range=document.caretRangeFromPoint?.(x,y);
  if(!range||!node.contains(range.startContainer))return;
  const prefix=document.createRange();prefix.selectNodeContents(node);prefix.setEnd(range.startContainer,range.startOffset);
- const token=tokenAt(node.dataset.markText,prefix.toString().length);if(token)toggleRedMark(node,token.start,token.end);
+ return tokenAt(node.dataset.markText,prefix.toString().length);
 }
-function cancelMarkPress(){clearTimeout(pressTimer);press=null;}
+
+function cancelMarkPress(){clearTimeout(pressTimer);press=null;lastWordTap=null;}
+function sameTappedWord(a,b){return a&&b&&a.key===b.key&&a.text===b.text&&a.start===b.start&&a.end===b.end;}
 document.addEventListener('pointerdown',e=>{
- if(e.button!==0||!e.isPrimary)return;const node=e.target.closest?.('[data-mark-key]');if(!node)return;
- cancelMarkPress();press={id:e.pointerId,node,x:e.clientX,y:e.clientY};
- pressTimer=setTimeout(()=>{const active=press;if(!active)return;press=null;markAtPoint(active.node,active.x,active.y);},500);
+ if(e.button!==0||!e.isPrimary){cancelMarkPress();return;}const node=e.target.closest?.('[data-mark-key]');if(!node){cancelMarkPress();return;}
+ clearTimeout(pressTimer);const token=tokenAtPoint(node,e.clientX,e.clientY);if(!token){cancelMarkPress();return;}
+ const now=performance.now(),identity={key:node.dataset.markKey,text:node.dataset.markText,...token};
+ const previous=lastWordTap&&sameTappedWord(lastWordTap,identity)&&now-lastWordTap.time<=350&&Math.hypot(e.clientX-lastWordTap.x,e.clientY-lastWordTap.y)<=24?lastWordTap:null;
+ if(!previous)lastWordTap=null;
+ const active={id:e.pointerId,node,x:e.clientX,y:e.clientY,started:now,identity,previous,long:false};press=active;
+ pressTimer=setTimeout(()=>{if(press!==active||!active.node.isConnected)return;active.long=true;lastWordTap=null;toggleRedMark(active.node,active.identity.start,active.identity.end);},500);
 });
 document.addEventListener('pointermove',e=>{if(press&&e.pointerId===press.id&&Math.hypot(e.clientX-press.x,e.clientY-press.y)>10)cancelMarkPress();},{passive:true});
-for(const name of ['pointerup','pointercancel'])document.addEventListener(name,cancelMarkPress,{passive:true});
+document.addEventListener('pointerup',e=>{
+ const active=press;if(!active||active.id!==e.pointerId)return;clearTimeout(pressTimer);press=null;
+ if(active.long||!active.node.isConnected||performance.now()-active.started>250||Math.hypot(e.clientX-active.x,e.clientY-active.y)>10){lastWordTap=null;return;}
+ if(active.previous&&lastWordTap===active.previous){lastWordTap=null;const word=active.identity.text.slice(active.identity.start,active.identity.end);if(/^[\p{Script=Latin}\p{M}]+(?:['’\-][\p{Script=Latin}\p{M}]+)*$/u.test(word)){e.preventDefault();openPhonetic(word);}return;}
+ lastWordTap={...active.identity,time:performance.now(),x:e.clientX,y:e.clientY};
+},{passive:false});
+document.addEventListener('pointercancel',cancelMarkPress,{passive:true});
 document.addEventListener('contextmenu',e=>{if(e.target.closest?.('[data-mark-key]'))e.preventDefault();});
-window.addEventListener('blur',cancelMarkPress);
+document.addEventListener('dblclick',e=>{if(e.target.closest?.('[data-mark-key]'))e.preventDefault();});
+window.addEventListener('blur',cancelMarkPress);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelMarkPress();});
+const PHONETIC_KEY='wordwell.phonetics.v1';
+let phoneticCache=new Map(),phoneticController=null,phoneticToken=0,phoneticWord='';
+try{const data=JSON.parse(localStorage.getItem(PHONETIC_KEY)||'[]');if(Array.isArray(data))for(const pair of data.slice(-500)){if(Array.isArray(pair)&&pair.length===2&&typeof pair[0]==='string'&&pair[1]&&Array.isArray(pair[1].values)&&pair[1].values.length<=12&&pair[1].values.every(v=>typeof v==='string'&&v.length>0&&v.length<=200)&&Number.isFinite(pair[1].savedAt))phoneticCache.set(pair[0],pair[1]);}}catch(e){}
+function showPhoneticValues(values,cached=false){const area=$('phonetic-result');area.replaceChildren();for(const value of values)area.append(element('div','phonetic-value',value));if(cached)area.append(element('div','phonetic-cached','本机缓存'));}
+async function openPhonetic(word,force=false){
+ cancelMarkPress();phoneticController?.abort();const token=++phoneticToken;phoneticWord=word;$('phonetic-title').textContent=word;$('phonetic-result').textContent='正在查询音标…';$('phonetic-source').replaceChildren(dictionaryCredit(word));$('phonetic-retry').hidden=true;
+ if(!$('phonetic-dialog').open)$('phonetic-dialog').showModal();
+ const key=word.toLowerCase(),cached=phoneticCache.get(key),age=cached?Date.now()-cached.savedAt:Infinity;
+ if(!force&&cached?.values.length&&age>=0&&age<30*DAY){showPhoneticValues(cached.values,true);return;}
+ const controller=new AbortController();phoneticController=controller;const timer=setTimeout(()=>controller.abort(),10000);
+ try{
+  const response=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(key),{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});
+  if(token!==phoneticToken)return;
+  if(response.status===404){$('phonetic-result').textContent='词典暂未收录这个词的音标';return;}if(!response.ok)throw Error();
+  const entries=await response.json();if(!Array.isArray(entries))throw Error();const values=[...new Set(entries.flatMap(entry=>[entry?.phonetic,...(Array.isArray(entry?.phonetics)?entry.phonetics.map(p=>p?.text):[])]).filter(value=>typeof value==='string'&&value.trim().length>0&&value.length<=200).map(value=>value.trim()))].slice(0,12);
+  if(token!==phoneticToken)return;if(!values.length){$('phonetic-result').textContent='词典暂未提供这个词的音标';return;}
+  phoneticCache.delete(key);phoneticCache.set(key,{values,savedAt:Date.now()});while(phoneticCache.size>500)phoneticCache.delete(phoneticCache.keys().next().value);
+  try{localStorage.setItem(PHONETIC_KEY,JSON.stringify([...phoneticCache]));}catch(e){}
+  showPhoneticValues(values);
+ }catch(e){if(token!==phoneticToken)return;if(cached?.values.length)showPhoneticValues(cached.values,true);else $('phonetic-result').textContent='查询失败，请联网后重试';$('phonetic-retry').hidden=false;}
+ finally{clearTimeout(timer);if(token===phoneticToken)phoneticController=null;}
+}
+$('phonetic-close').onclick=()=>$('phonetic-dialog').close();$('phonetic-dialog').addEventListener('close',()=>{phoneticToken++;phoneticController?.abort();phoneticController=null;cancelMarkPress();});$('phonetic-retry').onclick=()=>openPhonetic(phoneticWord,true);
 window.addEventListener('storage',e=>{if(e.key===MARKS_KEY||e.key===null){readMarks();for(const node of document.querySelectorAll('[data-mark-key]'))paintMarkedText(node,node.dataset.markKey,node.dataset.markText);}});
 
 window.addEventListener('storage',e=>{if([KEY,PLAN_KEY,SESSION_KEY,'wordwell.daily-limit',null].includes(e.key)){dailyPlan=null;session=null;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit)){dailyLimit=limit;$('daily-limit').value=String(limit);}}catch(e){}read();render();}});
