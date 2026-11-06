@@ -499,29 +499,40 @@ document.addEventListener('pointercancel',cancelMarkPress,{passive:true});
 document.addEventListener('contextmenu',e=>{if(e.target.closest?.('[data-mark-key]'))e.preventDefault();});
 document.addEventListener('dblclick',e=>{if(e.target.closest?.('[data-mark-key]'))e.preventDefault();});
 window.addEventListener('blur',cancelMarkPress);document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelMarkPress();});
-const PHONETIC_KEY='wordwell.phonetics.v1';
-let phoneticCache=new Map(),phoneticController=null,phoneticToken=0,phoneticWord='';
-try{const data=JSON.parse(localStorage.getItem(PHONETIC_KEY)||'[]');if(Array.isArray(data))for(const pair of data.slice(-500)){if(Array.isArray(pair)&&pair.length===2&&typeof pair[0]==='string'&&pair[1]&&Array.isArray(pair[1].values)&&pair[1].values.length<=12&&pair[1].values.every(v=>typeof v==='string'&&v.length>0&&v.length<=200)&&Number.isFinite(pair[1].savedAt))phoneticCache.set(pair[0],pair[1]);}}catch(e){}
+// ipa-dict en_US (General American), fixed revision. Copyright (c) 2016 dohliam.
+// MIT license: https://github.com/open-dict-data/ipa-dict/blob/972cd67dd5f96bc5660e28070cde26e3928abcd7/LICENSE
+const US_IPA_REV='972cd67dd5f96bc5660e28070cde26e3928abcd7';
+const US_IPA_URL='https://cdn.jsdelivr.net/gh/open-dict-data/ipa-dict@'+US_IPA_REV+'/data/en_US.txt';
+const PHONETIC_KEY='wordwell.phonetics.us.v2',US_IPA_CACHE='wordwell-us-ipa-'+US_IPA_REV;
+let phoneticCache=new Map(),phoneticToken=0,phoneticWord='',usLexiconPromise=null;
+function completeUSIPA(value){return typeof value==='string'&&value.length<=200&&/^\/[^/]+\/$/u.test(value)&&!/[\-…]/u.test(value);}
+try{const data=JSON.parse(localStorage.getItem(PHONETIC_KEY)||'[]');if(Array.isArray(data))for(const pair of data.slice(-500)){if(Array.isArray(pair)&&pair.length===2&&typeof pair[0]==='string'&&pair[1]?.revision===US_IPA_REV&&Array.isArray(pair[1].values)&&pair[1].values.length>0&&pair[1].values.length<=12&&pair[1].values.every(completeUSIPA))phoneticCache.set(pair[0],pair[1]);}}catch(e){}
+function usPhoneticCredit(){const area=element('div','lookup-credit');area.append(document.createTextNode('美式英语 · '));for(const [label,url] of [['ipa-dict / en_US','https://github.com/open-dict-data/ipa-dict/blob/'+US_IPA_REV+'/data/en_US.txt'],['MIT','https://github.com/open-dict-data/ipa-dict/blob/'+US_IPA_REV+'/LICENSE']]){const a=element('a','',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';area.append(a,document.createTextNode(' · '));}return area;}
+function parseUSLexicon(text){const map=new Map();for(const line of text.split('\n')){const tab=line.indexOf('\t');if(tab<1)continue;const key=line.slice(0,tab).trim().toLowerCase(),values=[...new Set(line.slice(tab+1).trim().split(/,\s*/).filter(completeUSIPA))];if(values.length)map.set(key,values);}if(map.size<1000)throw Error('词表不完整');return map;}
+async function loadUSLexicon(){
+ if(usLexiconPromise)return usLexiconPromise;
+ usLexiconPromise=(async()=>{
+  let cache;try{cache=await caches.open(US_IPA_CACHE);const response=await cache.match(US_IPA_URL);if(response)return parseUSLexicon(await response.text());}catch(e){}
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);
+  try{const response=await fetch(US_IPA_URL,{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer',integrity:'sha256-KvbxVKXDYydfBS0fhazt7zjtGFypdFqkMUvnf2tw3mc='});if(!response.ok)throw Error();const copy=response.clone(),map=parseUSLexicon(await response.text());try{await cache?.put(US_IPA_URL,copy);}catch(e){}return map;}finally{clearTimeout(timer);}
+ })();
+ try{return await usLexiconPromise;}catch(e){usLexiconPromise=null;throw e;}
+}
 function showPhoneticValues(values,cached=false){const area=$('phonetic-result');area.replaceChildren();for(const value of values)area.append(element('div','phonetic-value',value));if(cached)area.append(element('div','phonetic-cached','本机缓存'));}
 async function openPhonetic(word,force=false){
- cancelMarkPress();phoneticController?.abort();const token=++phoneticToken;phoneticWord=word;$('phonetic-title').textContent=word;$('phonetic-result').textContent='正在查询音标…';$('phonetic-source').replaceChildren(dictionaryCredit(word));$('phonetic-retry').hidden=true;
+ cancelMarkPress();const token=++phoneticToken;phoneticWord=word;$('phonetic-title').textContent=word;$('phonetic-result').textContent='正在查询美式音标…';$('phonetic-source').replaceChildren(usPhoneticCredit());$('phonetic-retry').hidden=true;
  if(!$('phonetic-dialog').open)$('phonetic-dialog').showModal();
- const key=word.toLowerCase(),cached=phoneticCache.get(key),age=cached?Date.now()-cached.savedAt:Infinity;
- if(!force&&cached?.values.length&&age>=0&&age<30*DAY){showPhoneticValues(cached.values,true);return;}
- const controller=new AbortController();phoneticController=controller;const timer=setTimeout(()=>controller.abort(),10000);
+ const key=word.toLowerCase().replaceAll('’',"'"),cached=phoneticCache.get(key);
+ if(!force&&cached){showPhoneticValues(cached.values,true);return;}
  try{
-  const response=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(key),{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});
-  if(token!==phoneticToken)return;
-  if(response.status===404){$('phonetic-result').textContent='词典暂未收录这个词的音标';return;}if(!response.ok)throw Error();
-  const entries=await response.json();if(!Array.isArray(entries))throw Error();const values=[...new Set(entries.flatMap(entry=>[entry?.phonetic,...(Array.isArray(entry?.phonetics)?entry.phonetics.map(p=>p?.text):[])]).filter(value=>typeof value==='string'&&value.trim().length>0&&value.length<=200).map(value=>value.trim()))].slice(0,12);
-  if(token!==phoneticToken)return;if(!values.length){$('phonetic-result').textContent='词典暂未提供这个词的音标';return;}
-  phoneticCache.delete(key);phoneticCache.set(key,{values,savedAt:Date.now()});while(phoneticCache.size>500)phoneticCache.delete(phoneticCache.keys().next().value);
+  const lexicon=await loadUSLexicon();if(token!==phoneticToken)return;const values=lexicon.get(key);
+  if(!values?.length){$('phonetic-result').textContent='美式词表暂未收录这个词';return;}
+  phoneticCache.delete(key);phoneticCache.set(key,{values,revision:US_IPA_REV});while(phoneticCache.size>500)phoneticCache.delete(phoneticCache.keys().next().value);
   try{localStorage.setItem(PHONETIC_KEY,JSON.stringify([...phoneticCache]));}catch(e){}
   showPhoneticValues(values);
- }catch(e){if(token!==phoneticToken)return;if(cached?.values.length)showPhoneticValues(cached.values,true);else $('phonetic-result').textContent='查询失败，请联网后重试';$('phonetic-retry').hidden=false;}
- finally{clearTimeout(timer);if(token===phoneticToken)phoneticController=null;}
+ }catch(e){if(token!==phoneticToken)return;$('phonetic-result').textContent='美式音标词表加载失败，请联网后重试';$('phonetic-retry').hidden=false;}
 }
-$('phonetic-close').onclick=()=>$('phonetic-dialog').close();$('phonetic-dialog').addEventListener('close',()=>{phoneticToken++;phoneticController?.abort();phoneticController=null;cancelMarkPress();});$('phonetic-retry').onclick=()=>openPhonetic(phoneticWord,true);
+$('phonetic-close').onclick=()=>$('phonetic-dialog').close();$('phonetic-dialog').addEventListener('close',()=>{phoneticToken++;cancelMarkPress();});$('phonetic-retry').onclick=()=>openPhonetic(phoneticWord,true);
 window.addEventListener('storage',e=>{if(e.key===MARKS_KEY||e.key===null){readMarks();for(const node of document.querySelectorAll('[data-mark-key]'))paintMarkedText(node,node.dataset.markKey,node.dataset.markText);}});
 
 window.addEventListener('storage',e=>{if([KEY,PLAN_KEY,SESSION_KEY,'wordwell.daily-limit',null].includes(e.key)){dailyPlan=null;session=null;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit)){dailyLimit=limit;$('daily-limit').value=String(limit);}}catch(e){}read();render();}});
