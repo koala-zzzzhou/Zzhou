@@ -114,9 +114,9 @@ function retryModule(p){
  if(!w||!isCrossDay(w))return 'zh-en';
  return ['zh-en','review'].includes(p.module)?p.module:'review';
 }
-function visibleQueue(){
+function visibleQueue(module=direction){
  const queue=queueWords(),pending=new Map(session.pending.map(p=>[p.id,p]));
- return queue.filter(w=>{const retry=pending.get(w.id);if(retry)return !['zh-en','review'].includes(direction)||retryModule(retry)===direction;return direction==='zh-en'?!isCrossDay(w):direction==='review'?isCrossDay(w):true;});
+ return queue.filter(w=>{const retry=pending.get(w.id);if(retry)return !['zh-en','review'].includes(module)||retryModule(retry)===module;return module==='zh-en'?!isCrossDay(w):module==='review'?isCrossDay(w):true;});
 }
 function renderCard(){
  const queue=visibleQueue(),preview=direction==='en-zh',library=direction==='library',speaking=direction==='speaking',cardMode=!preview&&!library&&!speaking;
@@ -138,7 +138,7 @@ function renderCard(){
  $('card').setAttribute('aria-label',flipped?'英文答案':'中文题面');
 }
 function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const filtered=words.filter(w=>[w.word,w.definition,groupName(w)].join(' ').toLocaleLowerCase().includes(query));$('shown').textContent=filtered.length+' 词';groupRows(filtered,$('list'),true);}
-function render(){todayWords();$('total').textContent=words.length;$('due-count').textContent=queueWords().length;$('learned').textContent=words.filter(w=>w.mastered).length;renderCard();renderList();}
+function render(){todayWords();$('total').textContent=words.length;$('due-count').textContent=visibleQueue('review').length;$('learned').textContent=words.filter(w=>w.mastered).length;renderCard();renderList();}
 function setDirection(value){clearUndoFeedback();direction=value;flipped=false;pendingGrade=null;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
 $('en-zh').onclick=()=>setDirection('en-zh');$('zh-en').onclick=()=>setDirection('zh-en');$('tab-review').onclick=()=>setDirection('review');$('tab-library').onclick=()=>setDirection('library');$('tab-speaking').onclick=()=>setDirection('speaking');
 
