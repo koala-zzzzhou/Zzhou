@@ -9,11 +9,13 @@
 
 .plan-tools{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.plan-tools label{display:flex;align-items:center;gap:8px;margin:0;font-size:12px;color:var(--muted)}select{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:7px 10px;background:#fffefa}.direction-switch{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}.direction-switch button{min-width:100px}.layout.is-list{grid-template-columns:minmax(0,1fr)}.layout.is-list>section>.section-head{grid-column:1/-1}.layout.is-list #today-preview{grid-column:1/-1}#library-view{margin-top:16px}.layout:not(.is-list) #undo-review{grid-row:1}.layout:not(.is-list) .direction-switch{grid-column:1/-1}
 @media(max-width:640px){.direction-switch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%}.direction-switch button{min-width:0;padding:10px 2px;font-size:12px}.plan-tools{gap:8px}.layout:not(.is-list) #undo-review{grid-row:1} .plan-tools label{font-size:11px}}
+
+.card{cursor:default}#ratings button[data-grade="good"]{background:var(--lime);border-color:var(--lime)}#ratings button[data-grade="again"]{background:#fffefa;border-color:var(--line)}
 </style></head><body>
 <header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
 <main><div id="storage-warning" class="notice" role="alert" hidden></div>
-<div class="layout"><section><div class="section-head"><h2 id="module-title">今日预览</h2><div class="plan-tools"><label id="limit-control" for="daily-limit">今日数量 <select id="daily-limit"><option value="100">100</option><option value="120">120</option><option value="140">140</option></select></label><span id="review-count" class="pill"></span></div></div><nav class="direction-switch" aria-label="单词模块"><button id="en-zh" aria-pressed="true">今日预览</button><button id="zh-en" aria-pressed="false">学习</button><button id="tab-review" aria-pressed="false">复习</button><button id="tab-library" aria-pressed="false">词库</button></nav><section id="today-preview"><div id="today-list" class="group-grid"></div></section><button id="card" class="card" aria-label="翻卡" hidden><span id="card-content" class="card-content"></span></button></section>
-<aside id="score-panel" class="score-panel"><div id="ratings" class="ratings"><button data-grade="again" disabled>忘记了</button><button data-grade="good" disabled>记得</button></div><div id="queue-status" role="status"></div><button id="undo-review" type="button" aria-label="撤销上次评分" title="撤销上次评分" disabled>↶</button></aside></div>
+<div class="layout"><section><div class="section-head"><h2 id="module-title">今日预览</h2><div class="plan-tools"><label id="limit-control" for="daily-limit">今日数量 <select id="daily-limit"><option value="100">100</option><option value="120">120</option><option value="140">140</option></select></label><span id="review-count" class="pill"></span></div></div><nav class="direction-switch" aria-label="单词模块"><button id="en-zh" aria-pressed="true">今日预览</button><button id="zh-en" aria-pressed="false">学习</button><button id="tab-review" aria-pressed="false">复习</button><button id="tab-library" aria-pressed="false">词库</button></nav><section id="today-preview"><div id="today-list" class="group-grid"></div></section><div id="card" class="card" role="group" aria-live="polite" aria-label="中文题面" hidden><span id="card-content" class="card-content"></span></div></section>
+<aside id="score-panel" class="score-panel"><div id="ratings" class="ratings"><button data-grade="good" disabled>记得</button><button data-grade="again" disabled>不记得</button></div><div id="queue-status" role="status"></div><button id="undo-review" type="button" aria-label="撤销上次评分" title="撤销上次评分" disabled>↶</button></aside></div>
 <section class="library" id="library-view" hidden><div class="section-head"><h2>词库</h2><span id="shown" class="pill"></span></div><div class="tools"><input id="search" type="search" aria-label="搜索词库" placeholder="搜索"></div><div id="list" class="group-grid"></div></section></main>
 <nav class="floating-actions" aria-label="词库操作"><button id="single-import">单个导入</button><button id="import">批量导入</button><button id="export">导出</button></nav>
 <dialog id="single-dialog" aria-labelledby="single-title"><div class="dialog-header"><h2 id="single-title">单个导入</h2><button id="single-close" type="button" aria-label="关闭">×</button></div><form class="side" id="add-form"><label for="word">英文</label><input id="word" required maxlength="120" autocomplete="off"><button id="lookup" class="lookup-button" type="button">查释义与例句</button><p id="lookup-status" role="status"></p><div id="lookup-preview" class="lookup-preview"></div><label for="definition">中文</label><textarea id="definition" required maxlength="2000"></textarea><label for="examples">例句</label><textarea id="examples" maxlength="4000"></textarea><div id="example-credit" hidden></div><label for="tags">单元 / 分类</label><input id="tags" maxlength="200"><button class="solid" type="submit">保存</button></form></dialog>
@@ -24,9 +26,10 @@
 const KEY='wordwell.v1',DAY=86400000,INTERVALS=[1,2,4,7,15,30,60,90,180],PLAN_KEY='wordwell.daily-plan.v1',SESSION_KEY='wordwell.review-session.v2';
 const $=id=>document.getElementById(id),clone=value=>JSON.parse(JSON.stringify(value));
 let words=[],currentId=null,flipped=false,storageOK=true,toastTimer,backupURL=null,direction='en-zh',dailyPlan=null,session=null;
+let pendingGrade=null;
 const reviewHistory=[];let dailyLimit=100;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit))dailyLimit=limit;}catch(e){}
 $('daily-limit').value=String(dailyLimit);
-$('daily-limit').onchange=()=>{const value=Number($('daily-limit').value);if(![100,120,140].includes(value))return;dailyLimit=value;persist('wordwell.daily-limit',dailyLimit);currentId=null;flipped=false;render();};
+$('daily-limit').onchange=()=>{const value=Number($('daily-limit').value);if(![100,120,140].includes(value))return;dailyLimit=value;persist('wordwell.daily-limit',dailyLimit);currentId=null;flipped=false;pendingGrade=null;render();};
 try{const saved=localStorage.getItem('wordwell.module');if(['en-zh','zh-en','review','library'].includes(saved))direction=saved;}catch(e){}
 function localDay(time=Date.now()){const d=new Date(time);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function midnight(time=Date.now()){const d=new Date(time);d.setHours(0,0,0,0);return d.getTime();}
@@ -41,7 +44,7 @@ function read(){try{const raw=localStorage.getItem(KEY),data=JSON.parse(raw===nu
 function eligible(w){return !w.mastered&&w.due<=Date.now();}
 function ensureDay(){
  const day=localDay();if(dailyPlan?.day===day&&session?.day===day)return;
- reviewHistory.length=0;currentId=null;flipped=false;dailyPlan={day,ids:[]};session={day,count:0,pending:[]};
+ reviewHistory.length=0;currentId=null;flipped=false;pendingGrade=null;dailyPlan={day,ids:[]};session={day,count:0,pending:[]};
  try{const p=JSON.parse(localStorage.getItem(PLAN_KEY));if(p?.day===day&&Array.isArray(p.ids)&&p.ids.length<=140&&p.ids.every(id=>typeof id==='string')&&new Set(p.ids).size===p.ids.length)dailyPlan=p;}catch(e){}
  try{const q=JSON.parse(localStorage.getItem(SESSION_KEY));if(q?.day===day&&Number.isSafeInteger(q.count)&&q.count>=0&&Array.isArray(q.pending)&&q.pending.every(p=>typeof p.id==='string'&&Number.isSafeInteger(p.readyAt)&&p.readyAt>=0)&&new Set(q.pending.map(p=>p.id)).size===q.pending.length)session=q;}catch(e){}
 }
@@ -85,24 +88,25 @@ function renderCard(){
  $('module-title').textContent={'en-zh':'今日预览','zh-en':'学习','review':'复习','library':'词库'}[direction];
  $('limit-control').hidden=!preview;$('library-view').hidden=!library;$('today-preview').hidden=!preview;$('card').hidden=!cardMode;$('score-panel').hidden=!cardMode;
  const layout=document.querySelector('.layout');layout.classList.toggle('is-preview',preview);layout.classList.toggle('is-list',!cardMode);
- let w=queue.find(w=>w.id===currentId);if(!w){w=queue[0];currentId=w?.id||null;flipped=false;}
+ let w=queue.find(w=>w.id===currentId);if(!w){w=queue[0];currentId=w?.id||null;flipped=false;pendingGrade=null;}
  $('review-count').textContent=library?words.length+' 词':`${todayWords().length} / ${dailyLimit}`;
  const held=session.pending.filter(p=>words.some(w=>w.id===p.id)),waiting=held.filter(p=>p.readyAt>session.count);
  $('queue-status').textContent=queue.length?`待${direction==='zh-en'?'学习':'复习'} ${queue.length} · 待重现 ${held.length}`:direction==='review'&&waiting.length?`待重现 ${waiting.length} · 还需 ${Math.min(...waiting.map(p=>p.readyAt-session.count))} 个其他词`:'本轮完成';
  $('undo-review').hidden=false;$('undo-review').disabled=!cardMode||!reviewHistory.length;
- document.querySelectorAll('[data-grade]').forEach(b=>b.disabled=!cardMode||!w||!flipped);
+ document.querySelectorAll('[data-grade]').forEach(b=>b.disabled=!cardMode||!w);
+ document.querySelector('[data-grade=good]').textContent=flipped?'下一词':'记得';document.querySelector('[data-grade=again]').textContent=flipped?'记错了':'不记得';
  if(preview){groupRows(todayWords(),$('today-list'));return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
  if(!w){content.append(element('div','card-definition',direction==='review'&&waiting.length?'等待重现':'本轮完成'));return;}
  content.append(element('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition));
  if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach(t=>ex.append(element('div','',t)));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
- $('card').setAttribute('aria-label',flipped?'英文答案，点击返回中文':'中文题面，点击查看英文');
+ $('card').setAttribute('aria-label',flipped?'英文答案':'中文题面');
 }
 function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const filtered=words.filter(w=>[w.word,w.definition,groupName(w)].join(' ').toLocaleLowerCase().includes(query));$('shown').textContent=filtered.length+' 词';groupRows(filtered,$('list'),true);}
 function render(){todayWords();$('total').textContent=words.length;$('due-count').textContent=queueWords().length;$('learned').textContent=words.filter(w=>w.mastered).length;renderCard();renderList();}
-function setDirection(value){direction=value;flipped=false;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
+function setDirection(value){direction=value;flipped=false;pendingGrade=null;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
 $('en-zh').onclick=()=>setDirection('en-zh');$('zh-en').onclick=()=>setDirection('zh-en');$('tab-review').onclick=()=>setDirection('review');$('tab-library').onclick=()=>setDirection('library');
-$('card').onclick=()=>{if(!currentId||!['zh-en','review'].includes(direction))return;flipped=!flipped;renderCard();};
+
 function normalizeSchedule(w){if(w.scheduleVersion===2)return;w.stage=[0,1,2,4,4,6,8,9][Math.min(7,w.stage)];w.scheduleVersion=2;}
 function advanceNormal(w){if(w.stage>=INTERVALS.length){w.mastered=true;w.due=0;return;}w.due=calendarDays(Date.now(),INTERVALS[w.stage]);w.stage++;}
 function gradeWord(grade){
@@ -118,13 +122,17 @@ function gradeWord(grade){
    else{delete w.reinforcement;advanceNormal(w);}
   }else advanceNormal(w);
  }
- reviewHistory.push({before,after:JSON.stringify(w),session:previousSession});save();persist(SESSION_KEY,session);currentId=null;flipped=false;render();
+ reviewHistory.push({before,after:JSON.stringify(w),session:previousSession});save();persist(SESSION_KEY,session);currentId=null;flipped=false;pendingGrade=null;render();
 }
-document.querySelectorAll('[data-grade]').forEach(b=>b.onclick=()=>gradeWord(b.dataset.grade));
+document.querySelectorAll('[data-grade]').forEach(b=>b.onclick=()=>{
+ if(!['zh-en','review'].includes(direction)||!visibleQueue().some(w=>w.id===currentId))return;
+ if(!flipped){pendingGrade=b.dataset.grade;flipped=true;renderCard();return;}
+ gradeWord(b.dataset.grade==='again'?'again':pendingGrade||'again');
+});
 $('undo-review').onclick=()=>{
  ensureDay();const prev=reviewHistory.pop();if(!prev)return;const i=words.findIndex(w=>w.id===prev.before.id);
  if(i<0||JSON.stringify(words[i])!==prev.after){render();toast('词条已变更，未覆盖');return;}
- words[i]=prev.before;session=prev.session;direction=studied(prev.before)?'review':'zh-en';try{localStorage.setItem('wordwell.module',direction);}catch(e){}save();persist(SESSION_KEY,session);currentId=prev.before.id;flipped=true;render();
+ words[i]=prev.before;session=prev.session;direction=studied(prev.before)?'review':'zh-en';try{localStorage.setItem('wordwell.module',direction);}catch(e){}save();persist(SESSION_KEY,session);currentId=prev.before.id;flipped=false;pendingGrade=null;render();
 };
 $('search').oninput=renderList;
 $('single-import').onclick=()=>$('single-dialog').showModal();$('single-close').onclick=()=>$('single-dialog').close();
