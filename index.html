@@ -130,7 +130,7 @@ function renderCard(){
  $('undo-review').hidden=false;$('undo-review').disabled=!cardMode||!reviewHistory.length;
  document.querySelectorAll('[data-grade]').forEach(b=>b.disabled=!cardMode||!w);
  document.querySelector('[data-grade=good]').textContent=flipped?'下一词':'记得';document.querySelector('[data-grade=again]').textContent=flipped?'记错了':'不记得';
- if(preview){groupRows(todayWords(),$('today-list'));return;}if(speaking){renderSpeaking();return;}if(library)return;
+ if(preview){const today=todayWords(),completed=new Set(session.completedIds),remaining=today.filter(w=>!completed.has(w.id));groupRows(remaining,$('today-list'));if(!remaining.length)$('today-list').replaceChildren(element('div','empty',today.length?'今日清单已完成':'暂无待学词'));return;}if(speaking){renderSpeaking();return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
  if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':direction==='review'?'暂无到期复习':'本轮完成'));return;}
  content.append(markedText('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition,markKey('word',w.id,flipped?'word':'definition')));
