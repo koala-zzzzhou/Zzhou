@@ -35,6 +35,7 @@
 'use strict';
 const KEY='wordwell.v1',DAY=86400000,INTERVALS=[1,2,4,7,15,30,60,90,180],PLAN_KEY='wordwell.daily-plan.v1',SESSION_KEY='wordwell.review-session.v2';
 const $=id=>document.getElementById(id),clone=value=>JSON.parse(JSON.stringify(value));
+const RETRY_GAPS=[5,10,20];
 let words=[],currentId=null,flipped=false,storageOK=true,toastTimer,backupURL=null,direction='en-zh',dailyPlan=null,session=null;
 let pendingGrade=null,undoFeedbackTimer;
 const reviewHistory=[];let dailyLimit=100;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit))dailyLimit=limit;}catch(e){}
@@ -59,6 +60,7 @@ function ensureDay(){
  reviewHistory.length=0;currentId=null;flipped=false;pendingGrade=null;dailyPlan={day,ids:[]};session={day,count:0,pending:[],completedIds:[]};
  try{const p=JSON.parse(localStorage.getItem(PLAN_KEY));if(p?.day===day&&Array.isArray(p.ids)&&p.ids.length<=140&&p.ids.every(id=>typeof id==='string')&&new Set(p.ids).size===p.ids.length)dailyPlan=p;}catch(e){}
  try{const q=JSON.parse(localStorage.getItem(SESSION_KEY));if(q?.day===day&&Number.isSafeInteger(q.count)&&q.count>=0&&Array.isArray(q.pending)&&q.pending.every(p=>typeof p.id==='string'&&Number.isSafeInteger(p.readyAt)&&p.readyAt>=0)&&new Set(q.pending.map(p=>p.id)).size===q.pending.length)session=q;}catch(e){}
+ let upgraded=false;session.pending=session.pending.map(p=>{if(Number.isInteger(p.round)&&p.round>=0&&p.round<RETRY_GAPS.length)return p;upgraded=true;return {...p,round:0,readyAt:Math.max(0,p.readyAt-5)};});if(upgraded)persist(SESSION_KEY,session);
  const storedIds=Array.isArray(session.completedIds)?session.completedIds.filter(id=>typeof id==='string'&&id.length>0):[];
  const completedIds=[...new Set([...storedIds,...words.filter(w=>w.lastReviewedDay===day).map(w=>w.id)])];
  if(JSON.stringify(session.completedIds)!==JSON.stringify(completedIds)){session.completedIds=completedIds;persist(SESSION_KEY,session);}
@@ -92,9 +94,13 @@ function todayWords(){
 }
 function queueWords(){
  const today=todayWords(),byId=new Map(today.map(w=>[w.id,w]));
- const held=new Set(session.pending.map(p=>p.id));
- const repeats=session.pending.filter(p=>p.readyAt<=session.count&&byId.has(p.id)&&!byId.get(p.id).mastered).sort((a,b)=>a.readyAt-b.readyAt).map(p=>byId.get(p.id));
- return [...repeats,...today.filter(w=>eligible(w)&&!held.has(w.id)).sort((a,b)=>a.due-b.due||a.created-b.created)];
+ const pending=session.pending.filter(p=>byId.has(p.id)&&!byId.get(p.id).mastered).sort((a,b)=>a.readyAt-b.readyAt);
+ const held=new Map(pending.map(p=>[p.id,p]));
+ const repeats=pending.filter(p=>p.readyAt<=session.count).map(p=>byId.get(p.id));
+ const queue=[...repeats,...today.filter(w=>eligible(w)&&!held.has(w.id)).sort((a,b)=>a.due-b.due||a.created-b.created)];
+ const moduleOf=w=>held.has(w.id)?retryModule(held.get(w.id)):isCrossDay(w)?'review':'zh-en';
+ for(const module of ['zh-en','review'])if(!queue.some(w=>moduleOf(w)===module)){const tail=pending.find(p=>retryModule(p)===module);if(tail)queue.push(byId.get(tail.id));}
+ return queue;
 }
 function cleanGroup(value){return String(value||'').split(/\s*[·,，|/]\s*/).map(t=>t.trim()).filter(t=>t&&!/^(?:必备|必背)(?:词汇|词组|单词)?$/.test(t)).join(' · ');}
 function groupName(w){return [w.unit,w.group,w.category,w.tags.join(' · ')].map(cleanGroup).find(Boolean)||'未分组';}
@@ -132,7 +138,7 @@ function renderCard(){
  document.querySelector('[data-grade=good]').textContent=flipped?'下一词':'记得';document.querySelector('[data-grade=again]').textContent=flipped?'记错了':'不记得';
  if(preview){const today=todayWords(),completed=new Set(session.completedIds),remaining=today.filter(w=>!completed.has(w.id));groupRows(remaining,$('today-list'));if(!remaining.length)$('today-list').replaceChildren(element('div','empty',today.length?'今日清单已完成':'暂无待学词'));return;}if(speaking){renderSpeaking();return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
- if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':direction==='review'?'暂无到期复习':'本轮完成'));return;}
+ if(!w){content.append(element('div','card-definition',direction==='review'?'暂无到期复习':'本轮完成'));return;}
  content.append(markedText('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition,markKey('word',w.id,flipped?'word':'definition')));
  if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach((t,i)=>ex.append(markedText('div','',t,markKey('word',w.id,'example:'+i))));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
  $('card').setAttribute('aria-label',flipped?'英文答案':'中文题面');
@@ -146,12 +152,14 @@ function normalizeSchedule(w){if(w.scheduleVersion===2)return;w.stage=[0,1,2,4,4
 function advanceNormal(w){if(w.stage>=INTERVALS.length){w.mastered=true;w.due=0;return;}w.due=calendarDays(Date.now(),INTERVALS[w.stage]);w.stage++;}
 function gradeWord(grade){
  ensureDay();const queue=queueWords(),w=queue.find(item=>item.id===currentId);if(!w||!flipped||!['zh-en','review'].includes(direction))return;
- const before=clone(w),previousSession=clone(session),repeat=session.pending.some(p=>p.id===w.id);
+ const before=clone(w),previousSession=clone(session),retry=session.pending.find(p=>p.id===w.id),repeat=Boolean(retry);
  if(!validStudyDay(w.firstStudiedDay)||w.firstStudiedDay>localDay())w.firstStudiedDay=firstStudyDay(w)||localDay();normalizeSchedule(w);w.lastReviewedAt=Date.now();w.lastReviewedDay=localDay();w.reviewCount=(Number(w.reviewCount)||0)+1;w.mastered=false;session.count++;if(!session.completedIds.includes(w.id))session.completedIds.push(w.id);session.pending=session.pending.filter(p=>p.id!==w.id);
  if(grade==='again'){
   w.reinforcement={anchor:midnight(),step:0};w.due=calendarDays(w.reinforcement.anchor,1);
-  session.pending.push({id:w.id,readyAt:session.count+10,module:direction});
- }else if(!repeat){
+  session.pending.push({id:w.id,round:0,readyAt:session.count+RETRY_GAPS[0],module:direction});
+ }else if(repeat){
+  const round=retry.round+1;if(round<RETRY_GAPS.length)session.pending.push({...retry,round,readyAt:session.count+RETRY_GAPS[round],module:direction});
+ }else{
   if(w.reinforcement){
    if(w.reinforcement.step<2){w.reinforcement.step++;w.due=calendarDays(w.reinforcement.anchor,[1,3,5][w.reinforcement.step]);}
    else{delete w.reinforcement;advanceNormal(w);}
