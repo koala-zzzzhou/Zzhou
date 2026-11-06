@@ -18,6 +18,8 @@
 @media(max-width:640px){.direction-switch{grid-template-columns:repeat(5,minmax(0,1fr))}.direction-switch button{font-size:11px;line-height:1.5;min-height:44px;overflow-wrap:anywhere}.speaking-toolbar{flex-wrap:wrap}.speaking-toolbar input{flex-basis:100%}.speaking-topic-line{padding:10px 14px}.speaking-body{padding:14px}.speaking-question{font-size:16px}.speaking-answer{font-size:14px}}
 
 .markable{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-y}.red-mark{background:#ffd0d0;color:#792626;border-radius:2px;padding:0;font:inherit}
+
+.ocr-area{margin:16px 0}.ocr-picker{position:relative;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--line);border-radius:8px;padding:11px 18px;background:var(--lime);color:var(--ink);font-size:13px;cursor:pointer;margin:0}.ocr-picker input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}.ocr-picker:focus-within{outline:3px solid #a4be78;outline-offset:3px}.ocr-picker:has(input:disabled){opacity:.45;cursor:wait}.ocr-area progress{width:100%;margin-top:14px;accent-color:var(--green)}.ocr-area p{font-size:12px;margin:8px 0;white-space:pre-wrap}.ocr-area button{font-size:12px;padding:7px 12px}
 </style></head><body>
 <header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
 <main><div id="storage-warning" class="notice" role="alert" hidden></div>
@@ -26,8 +28,8 @@
 <section class="library" id="library-view" hidden><div class="section-head"><span id="shown" class="pill"></span></div><div class="tools"><input id="search" type="search" aria-label="搜索词库" placeholder="搜索"></div><div id="list" class="group-grid"></div></section><section id="speaking-view" hidden><div class="speaking-toolbar"><input id="speaking-search" type="search" aria-label="搜索口语库" placeholder="搜索题型、问题或答案"><button id="speaking-import" class="solid" type="button">导入口语</button><button id="speaking-export" type="button">导出口语</button></div><div id="speaking-list"></div></section></main>
 <nav class="floating-actions" aria-label="词库操作"><button id="single-import">单个导入</button><button id="import">批量导入</button><button id="export">导出</button></nav>
 <dialog id="single-dialog" aria-labelledby="single-title"><div class="dialog-header"><h2 id="single-title">单个导入</h2><button id="single-close" type="button" aria-label="关闭">×</button></div><form class="side" id="add-form"><label for="word">英文</label><input id="word" required maxlength="120" autocomplete="off"><button id="lookup" class="lookup-button" type="button">查释义与例句</button><p id="lookup-status" role="status"></p><div id="lookup-preview" class="lookup-preview"></div><label for="definition">中文</label><textarea id="definition" required maxlength="2000"></textarea><label for="examples">例句</label><textarea id="examples" maxlength="4000"></textarea><div id="example-credit" hidden></div><label for="tags">单元 / 分类</label><input id="tags" maxlength="200"><button class="solid" type="submit">保存</button></form></dialog>
-<dialog id="backup-dialog" aria-labelledby="backup-title"><div class="dialog-header"><h2 id="backup-title">批量导入</h2><button id="backup-close" type="button" aria-label="关闭">×</button></div><div id="bulk-unit-area"><label for="bulk-unit">单元 / 分类</label><input id="bulk-unit" maxlength="200"></div><div id="backup-file-area"><label for="backup-file">文件</label><input id="backup-file" type="file" accept=".json,.txt,.tsv,.csv,application/json,text/plain"></div><label for="backup-text">内容</label><textarea id="backup-text" spellcheck="false" placeholder="英文&#9;中文"></textarea><p id="backup-status" role="status" aria-live="polite"></p><div class="backup-actions"><a id="backup-download" download="wordwell-backup.json">下载 JSON</a><button id="backup-copy">复制</button><button id="backup-merge" class="solid">导入</button></div></dialog>
-<dialog id="speaking-dialog" aria-labelledby="speaking-dialog-title"><div class="dialog-header"><h2 id="speaking-dialog-title">导入 Part 1 口语</h2><button id="speaking-close" type="button" aria-label="关闭口语导入">×</button></div><div class="speaking-import-modes" role="group" aria-label="口语导入方式"><button id="speaking-manual-tab" type="button" aria-pressed="true">填写导入</button><button id="speaking-text-tab" type="button" aria-pressed="false">文本 / 文件导入</button></div><form id="speaking-form"><label for="speaking-topic">题型</label><input id="speaking-topic" required maxlength="120"><label for="speaking-question">问题</label><textarea id="speaking-question" required maxlength="2000"></textarea><label for="speaking-answer">答案</label><textarea id="speaking-answer" required maxlength="20000"></textarea><button type="submit" class="solid speaking-submit">保存口语</button></form><div id="speaking-batch" hidden><label for="speaking-file">口语文件</label><input id="speaking-file" type="file" accept=".json,.txt,.md,text/plain,application/json"><label for="speaking-text">口语文本 / JSON</label><textarea id="speaking-text" placeholder="题型：opportunity&#10;## Did you have any opportunities to take part in new activities as a child?&#10;回答：Your answer..."></textarea><button id="speaking-batch-save" class="solid speaking-submit" type="button">导入口语</button></div><p id="speaking-status" role="status" aria-live="polite"></p></dialog>
+<dialog id="backup-dialog" aria-labelledby="backup-title"><div class="dialog-header"><h2 id="backup-title">批量导入</h2><button id="backup-close" type="button" aria-label="关闭">×</button></div><div id="bulk-unit-area"><label for="bulk-unit">单元 / 分类</label><input id="bulk-unit" maxlength="200"></div><div id="backup-file-area"><label for="backup-file">文件</label><input id="backup-file" type="file" accept=".json,.txt,.tsv,.csv,application/json,text/plain"></div><div class="ocr-area" id="word-ocr-area"><label class="ocr-picker">图片识别<input id="word-ocr-file" type="file" accept="image/*" multiple aria-label="选择单词截图"></label><div id="word-ocr-panel" hidden><progress id="word-ocr-progress" max="1" value="0" aria-label="图片识别进度"></progress><p id="word-ocr-status" role="status" aria-live="polite"></p><button id="word-ocr-cancel" type="button">取消识别</button></div></div><label for="backup-text">内容</label><textarea id="backup-text" spellcheck="false" placeholder="英文&#9;中文"></textarea><p id="backup-status" role="status" aria-live="polite"></p><div class="backup-actions"><a id="backup-download" download="wordwell-backup.json">下载 JSON</a><button id="backup-copy">复制</button><button id="backup-merge" class="solid">导入</button></div></dialog>
+<dialog id="speaking-dialog" aria-labelledby="speaking-dialog-title"><div class="dialog-header"><h2 id="speaking-dialog-title">导入 Part 1 口语</h2><button id="speaking-close" type="button" aria-label="关闭口语导入">×</button></div><div class="speaking-import-modes" role="group" aria-label="口语导入方式"><button id="speaking-manual-tab" type="button" aria-pressed="true">填写导入</button><button id="speaking-text-tab" type="button" aria-pressed="false">文本 / 图片导入</button></div><form id="speaking-form"><label for="speaking-topic">题型</label><input id="speaking-topic" required maxlength="120"><label for="speaking-question">问题</label><textarea id="speaking-question" required maxlength="2000"></textarea><label for="speaking-answer">答案</label><textarea id="speaking-answer" required maxlength="20000"></textarea><button type="submit" class="solid speaking-submit">保存口语</button></form><div id="speaking-batch" hidden><label for="speaking-file">口语文件</label><input id="speaking-file" type="file" accept=".json,.txt,.md,text/plain,application/json"><div class="ocr-area"><label class="ocr-picker">图片识别<input id="speaking-ocr-file" type="file" accept="image/*" multiple aria-label="选择口语截图"></label><label for="speaking-ocr-topic">截图题型</label><input id="speaking-ocr-topic" maxlength="120" placeholder="截图没有题型时，可填写"><div id="speaking-ocr-panel" hidden><progress id="speaking-ocr-progress" max="1" value="0" aria-label="口语图片识别进度"></progress><p id="speaking-ocr-status" role="status" aria-live="polite"></p><button id="speaking-ocr-cancel" type="button">取消识别</button></div></div><label for="speaking-text">口语文本 / JSON</label><textarea id="speaking-text" placeholder="题型：opportunity&#10;## Did you have any opportunities to take part in new activities as a child?&#10;回答：Your answer..."></textarea><button id="speaking-batch-save" class="solid speaking-submit" type="button">导入口语</button></div><p id="speaking-status" role="status" aria-live="polite"></p></dialog>
 <div id="toast" role="status" aria-live="polite"></div><script id="offline-seed" type="application/json">[]</script><script>
 
 'use strict';
@@ -219,7 +221,7 @@ function backupStatus(message){$('backup-status').textContent=message;}
 function openBackup(mode){
   const exporting=mode==='export';
   $('backup-title').textContent=exporting?'导出':'批量导入';
-  $('bulk-unit-area').hidden=exporting;
+  $('word-ocr-area').hidden=exporting;$('bulk-unit-area').hidden=exporting;
   $('backup-file-area').hidden=exporting;
   $('backup-download').hidden=!exporting;
   $('backup-copy').hidden=!exporting;
@@ -279,7 +281,7 @@ function renderSpeaking(){
  header.append(del);body.append(markedText('h3','speaking-question',entry.question,markKey('speaking',entry.id,'question')),markedText('p','speaking-answer',entry.answer,markKey('speaking',entry.id,'answer')));box.append(header,body);list.append(box);
  }
 }
-function speakingImportMode(text){$('speaking-form').hidden=text;$('speaking-batch').hidden=!text;$('speaking-manual-tab').setAttribute('aria-pressed',String(!text));$('speaking-text-tab').setAttribute('aria-pressed',String(text));$('speaking-status').textContent='';}
+function speakingImportMode(text){if(!text)cancelOcr('speaking');$('speaking-form').hidden=text;$('speaking-batch').hidden=!text;$('speaking-manual-tab').setAttribute('aria-pressed',String(!text));$('speaking-text-tab').setAttribute('aria-pressed',String(text));$('speaking-status').textContent='';}
 $('speaking-import').onclick=()=>{$('speaking-dialog').showModal();};
 $('speaking-close').onclick=()=>$('speaking-dialog').close();
 $('speaking-manual-tab').onclick=()=>speakingImportMode(false);$('speaking-text-tab').onclick=()=>speakingImportMode(true);
@@ -314,6 +316,101 @@ $('speaking-file').onchange=async e=>{const file=e.target.files[0];if(!file)retu
 $('speaking-export').onclick=()=>download(JSON.stringify({version:1,speaking:speakingItems},null,2),'application/json','wordwell-part1-backup.json');
 window.addEventListener('storage',e=>{if(e.key===SPEAKING_KEY||e.key===null){readSpeaking();renderSpeaking();if(direction==='speaking')$('review-count').textContent=speakingItems.length+' 题';}});
 
+
+
+const OCR_CDN='https://cdn.jsdelivr.net/npm/';
+const OCR_SCRIPT=OCR_CDN+'tesseract.js@7.0.0/dist/tesseract.min.js';
+let ocrScriptPromise=null,ocrJob=null;
+function loadOcrScript(){
+ if(window.Tesseract?.createWorker)return Promise.resolve();if(ocrScriptPromise)return ocrScriptPromise;
+ ocrScriptPromise=new Promise((resolve,reject)=>{
+  const script=document.createElement('script');script.src=OCR_SCRIPT;script.crossOrigin='anonymous';script.integrity='sha384-2BQ3U3OdKOb0Uczxqr41I9UvZkzr4V9Hv8uSzMMZAlmhsFClvdZX5wi5fDCzG+tM';
+  const timer=setTimeout(()=>fail(),45000);
+  function fail(){clearTimeout(timer);script.remove();ocrScriptPromise=null;reject(Error('识别组件下载失败，请联网后重试'));}
+  script.onerror=fail;script.onload=()=>{clearTimeout(timer);if(window.Tesseract?.createWorker)resolve();else fail();};document.head.append(script);
+ });return ocrScriptPromise;
+}
+function ocrStatus(job,text,value){if(job.cancelled||ocrJob!==job)return;$(job.target+'-ocr-status').textContent=text;if(Number.isFinite(value))$(job.target+'-ocr-progress').value=value;}
+function setOcrControls(busy){for(const target of ['word','speaking'])$(target+'-ocr-file').disabled=busy;$('backup-merge').disabled=busy;$('speaking-batch-save').disabled=busy;}
+function cancelOcr(target,message='已取消识别'){
+ const job=ocrJob;if(!job||job.target!==target)return;job.cancelled=true;$(target+'-ocr-status').textContent=message;$(target+'-ocr-cancel').hidden=true;job.abort(Error(message));if(job.worker)job.worker.terminate().catch(()=>{});
+}
+async function imageCanvas(file){
+ const url=URL.createObjectURL(file),img=new Image();
+ try{await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('图片读取超时')),20000);img.onload=()=>{clearTimeout(timer);resolve();};img.onerror=()=>{clearTimeout(timer);reject(Error('无法打开图片，请使用 PNG 或 JPG 截图'));};img.src=url;});
+  if(!img.naturalWidth||!img.naturalHeight)throw Error('图片为空');
+  const scale=Math.min(1,2600/Math.max(img.naturalWidth,img.naturalHeight),Math.sqrt(6000000/(img.naturalWidth*img.naturalHeight)));
+  const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));const ctx=canvas.getContext('2d');if(!ctx)throw Error('当前浏览器无法处理图片');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);return canvas;
+ }finally{URL.revokeObjectURL(url);img.src='';}
+}
+function ocrWordText(text){return text.split(/\r?\n/).map(line=>{
+ const raw=line.trim();if(!raw)return '';const firstChinese=raw.search(/[\u3400-\u9fff]/),firstEnglish=raw.search(/[A-Za-z]/);
+ if(firstChinese===0&&firstEnglish>0)return raw.slice(0,firstEnglish).trim()+'\t'+raw.slice(firstEnglish).trim();
+ if(firstEnglish===0&&firstChinese>0)return raw.slice(0,firstChinese).trim()+'\t'+raw.slice(firstChinese).trim();
+ return raw;
+}).filter(Boolean).join('\n');}
+
+function ocrColumnSplit(canvas){
+ const ctx=canvas.getContext('2d'),pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data,hist=new Uint32Array(canvas.width);
+ for(let y=0;y<canvas.height;y+=2)for(let x=0;x<canvas.width;x+=2){const i=(y*canvas.width+x)*4;if((pixels[i]+pixels[i+1]+pixels[i+2])/3<150)hist[x]++;}
+ const minInk=Math.max(2,canvas.height*.002);let first=0,last=2*Math.floor((canvas.width-1)/2);while(first<last&&hist[first]<=minInk)first+=2;while(last>first&&hist[last]<=minInk)last-=2;
+ if(last-first<150)return null;let best=null,start=null;
+ for(let x=first;x<=last;x+=2){if(hist[x]<=minInk){if(start===null)start=x;}else if(start!==null){const length=x-start,mid=(x+start)/2,position=(mid-first)/(last-first);if(length>=Math.max(22,canvas.width*.025)&&position>.2&&position<.8&&(!best||length>best.length))best={split:Math.round(mid),length};start=null;}}
+ return best?.split||null;
+}
+function ocrTsvLines(tsv){
+ const lines=new Map();if(typeof tsv!=='string')return [];
+ for(const row of tsv.split('\n').slice(1)){const values=row.split('\t');if(values.length<12||values[0]!=='5')continue;const text=values.slice(11).join('\t').trim();if(!text)continue;const top=Number(values[7]),height=Number(values[9]);if(!Number.isFinite(top)||!Number.isFinite(height))continue;
+  const key=values.slice(1,5).join('-');if(!lines.has(key))lines.set(key,{texts:[],top,bottom:top+height});const line=lines.get(key);line.texts.push(text);line.top=Math.min(line.top,top);line.bottom=Math.max(line.bottom,top+height);
+ }
+ return [...lines.values()].map(line=>({text:line.texts.join(' ').replace(/([\u3400-\u9fff])\s+(?=[\u3400-\u9fff])/g,'$1'),y:(line.top+line.bottom)/2,height:line.bottom-line.top})).sort((a,b)=>a.y-b.y);
+}
+async function ocrWordColumns(worker,canvas,raw,job,race){
+ const split=ocrColumnSplit(canvas);if(!split)return null;
+ let votes=0;for(const line of raw.split('\n')){const ch=line.search(/[\u3400-\u9fff]/),en=line.search(/[A-Za-z]/);if(ch>=0&&en>=0)votes+=ch<en?1:-1;}const chineseLeft=votes>=0;
+ const left=document.createElement('canvas'),right=document.createElement('canvas');left.width=split;right.width=canvas.width-split;left.height=right.height=canvas.height;
+ try{left.getContext('2d').drawImage(canvas,0,0,split,canvas.height,0,0,split,canvas.height);right.getContext('2d').drawImage(canvas,split,0,right.width,canvas.height,0,0,right.width,canvas.height);
+  const sides=[];for(const [image,lang] of [[left,chineseLeft?'chi_sim':'eng'],[right,chineseLeft?'eng':'chi_sim']]){job.phase=lang==='chi_sim'?'正在识别中文栏':'正在识别英文栏';await race(worker.reinitialize(lang));await race(worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'}));const result=await race(worker.recognize(image,{}, {text:true,tsv:true}));sides.push(ocrTsvLines(result.data.tsv));}
+  const [a,b]=sides;if(!a.length||!b.length)return null;const output=[],used=new Set();let paired=0;
+  for(const line of a){let match=-1,distance=Infinity;b.forEach((candidate,i)=>{const d=Math.abs(candidate.y-line.y);if(!used.has(i)&&d<distance){distance=d;match=i;}});if(match>=0&&distance<=Math.max(12,line.height,b[match].height)) {used.add(match);output.push({y:line.y,text:line.text+'\t'+b[match].text});paired++;}else output.push({y:line.y,text:line.text});}
+  b.forEach((line,i)=>{if(!used.has(i))output.push({y:line.y,text:line.text});});return paired?output.sort((x,y)=>x.y-y.y).map(line=>line.text).join('\n'):null;
+ }finally{left.width=right.width=1;left.height=right.height=1;job.phase='';}
+}
+
+function ocrSpeakingText(text,topic){
+ const raw=text.replace(/(^|[ \t])\|(?=[ \t])/gm,'$1I').trim();if(/(?:题型|话题|topic|category)\s*[:：]/i.test(raw)&&/(?:问题|question|回答|答案|answer)\s*[:：]|^\s*##/im.test(raw))return raw;
+ const lines=raw.split(/\r?\n/).map(line=>line.trim()).filter(Boolean);let end=lines.findIndex(line=>/[?？]\s*$/.test(line));if(end<0)return raw;
+ let start=0;if(!/^(?:do|did|does|have|has|had|are|is|was|were|can|could|would|will|what|where|when|why|how|who|which)\b/i.test(lines[0])&&end>0){topic=topic||lines[0].replace(/^(?:题型|话题|topic|category)\s*[:：]?\s*/i,'');start=1;}
+ const question=lines.slice(start,end+1).join(' '),answer=lines.slice(end+1).join(' ');if(!question||!answer)return raw;
+ return '题型：'+(topic||'未分类')+'\n问题：'+question+'\n回答：'+answer;
+}
+async function recognizeImages(target,fileList){
+ const files=Array.from(fileList||[]);if(!files.length)return;
+ if(ocrJob){toast('请先完成或取消当前识别');return;}
+ if(files.length>5){toast('每次最多识别 5 张截图');return;}
+ if(files.some(file=>file.size>15*1024*1024||(!file.type.startsWith('image/')&&!/\.(png|jpe?g|webp|gif|bmp|heic|heif)$/i.test(file.name)))){toast('请选择每张不超过 15 MB 的图片');return;}
+ const job={target,cancelled:false,worker:null};job.cancelPromise=new Promise((_,reject)=>{job.abort=reject;});job.cancelPromise.catch(()=>{});ocrJob=job;setOcrControls(true);$(target+'-ocr-panel').hidden=false;$(target+'-ocr-cancel').hidden=false;$(target+'-ocr-progress').value=0;
+ const timer=setTimeout(()=>cancelOcr(target,'识别超时，请换用更清晰或较小的截图重试'),120000);
+ const race=promise=>Promise.race([promise,job.cancelPromise]);let canvas;
+ try{
+  ocrStatus(job,'正在准备中英识别组件…',0);
+  await race(loadOcrScript());
+  const startup=window.Tesseract.createWorker('chi_sim+eng',1,{langPath:'https://cdn.jsdelivr.net/gh/tesseract-ocr/tessdata_fast@4.1.0',gzip:false,cachePath:'wordwell-ocr-v7-fast410',workerPath:OCR_CDN+'tesseract.js@7.0.0/dist/worker.min.js',corePath:OCR_CDN+'tesseract.js-core@7.0.0',logger:m=>{if(m.status==='loading language traineddata')ocrStatus(job,'正在准备中英识别数据…',m.progress);else if(m.status==='recognizing text')ocrStatus(job,(job.phase||'正在识别')+' '+Math.round(m.progress*100)+'%',m.progress);else ocrStatus(job,'正在初始化识别引擎…');},errorHandler:()=>{job.abort(Error('识别引擎未能完成，请重试或重新打开页面'));}}).then(worker=>{if(job.cancelled||job.finished){worker.terminate().catch(()=>{});throw Error('已取消识别');}job.worker=worker;return worker;});
+  const worker=await race(startup);await race(worker.setParameters({tessedit_pageseg_mode:target==='word'?'6':'3',preserve_interword_spaces:'1'}));let processed=0;
+  for(const file of files){
+   ocrStatus(job,`正在读取第 ${processed+1} / ${files.length} 张截图…`,0);canvas=await race(imageCanvas(file));
+   await race(worker.reinitialize('chi_sim+eng'));await race(worker.setParameters({tessedit_pageseg_mode:target==='word'?'6':'3',preserve_interword_spaces:'1'}));const result=await race(worker.recognize(canvas,{}, {text:true}));
+   if(job.cancelled)break;const text=result?.data?.text?.trim();if(!text)throw Error('未识别到文字，请选择清晰的截图');
+   const recognized=target==='word'?(await race(ocrWordColumns(worker,canvas,text,job,race))||ocrWordText(text)):ocrSpeakingText(text,$('speaking-ocr-topic').value.trim());canvas.width=1;canvas.height=1;canvas=null;
+   const field=target==='word'?$('backup-text'):$('speaking-text');field.value=[field.value.trim(),recognized].filter(Boolean).join('\n\n');processed++;
+  }
+  ocrStatus(job,`已识别 ${processed} 张截图，请核对文字后点击导入`,1);$(target+'-ocr-cancel').hidden=true;
+ }catch(error){if(!job.cancelled)ocrStatus(job,error.message||'识别失败，请检查网络并重试');}
+ finally{job.finished=true;clearTimeout(timer);if(canvas){canvas.width=1;canvas.height=1;}if(job.worker)job.worker.terminate().catch(()=>{});if(ocrJob===job){ocrJob=null;setOcrControls(false);$(target+'-ocr-cancel').hidden=true;}$(target+'-ocr-file').value='';}
+}
+for(const target of ['word','speaking']){$(target+'-ocr-file').onchange=e=>recognizeImages(target,e.target.files);$(target+'-ocr-cancel').onclick=()=>cancelOcr(target);}
+$('backup-dialog').addEventListener('close',()=>cancelOcr('word'));
+$('speaking-dialog').addEventListener('close',()=>cancelOcr('speaking'));
 
 const MARKS_KEY='wordwell.red-marks.v1';
 let redMarks=new Map(),marksStorageOK=true,press=null,pressTimer;
