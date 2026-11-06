@@ -16,6 +16,8 @@
 
 #speaking-view{margin-top:16px}.speaking-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}.speaking-toolbar input{flex:1;min-width:0}.speaking-toolbar button{white-space:nowrap;font-size:12px}.speaking-entry{background:#fffefa;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}.speaking-topic-line{display:flex;justify-content:space-between;gap:12px;padding:12px 20px;background:#e9eddf;align-items:center}.speaking-topic-title{font-size:13px;font-weight:600;overflow-wrap:anywhere}.speaking-topic-line button{border:0;background:transparent;padding:3px 8px;color:var(--muted)}.speaking-body{padding:18px 20px 22px}.speaking-question{font-size:18px;line-height:1.6;font-weight:600;margin:0 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}.speaking-answer{font-size:15px;line-height:1.85;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.speaking-import-modes{display:flex;gap:8px;margin-top:18px}.speaking-import-modes button{font-size:12px}.speaking-submit{margin-top:16px}#speaking-answer,#speaking-text{min-height:180px}#speaking-status{font-size:12px;white-space:pre-wrap}
 @media(max-width:640px){.direction-switch{grid-template-columns:repeat(5,minmax(0,1fr))}.direction-switch button{font-size:11px;line-height:1.5;min-height:44px;overflow-wrap:anywhere}.speaking-toolbar{flex-wrap:wrap}.speaking-toolbar input{flex-basis:100%}.speaking-topic-line{padding:10px 14px}.speaking-body{padding:14px}.speaking-question{font-size:16px}.speaking-answer{font-size:14px}}
+
+.markable{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:pan-y}.red-mark{background:#ffd0d0;color:#792626;border-radius:2px;padding:0;font:inherit}
 </style></head><body>
 <header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
 <main><div id="storage-warning" class="notice" role="alert" hidden></div>
@@ -85,10 +87,10 @@ function groupRows(items,target,actions=false){
  target.replaceChildren();if(!items.length){target.append(element('div','empty','暂无词条'));return;}
  const groups=new Map();for(const w of items){const name=groupName(w);if(!groups.has(name))groups.set(name,[]);groups.get(name).push(w);}
  for(const [name,entries] of groups){const box=element('section','group-box'),heading=element('div','group-heading');heading.append(element('h3','',name),element('span','group-count',entries.length+' 词'));box.append(heading);
-  for(const w of entries){const row=element('div','group-row'),en=element('div','english');en.append(element('span','',w.word));
+  for(const w of entries){const row=element('div','group-row'),en=element('div','english');en.append(markedText('span','',w.word,markKey('word',w.id,'word')));
    if(actions){const controls=element('span','row-actions');if(w.mastered){const retry=element('button','','↻');retry.type='button';retry.title='重新加入复习';retry.setAttribute('aria-label','重新复习 '+w.word);retry.onclick=()=>{w.mastered=false;w.scheduleVersion=2;w.stage=0;w.due=Date.now();delete w.reinforcement;session.pending=session.pending.filter(p=>p.id!==w.id);save();persist(SESSION_KEY,session);render();};controls.append(element('span','mastered','熟记'),retry);}
     const del=element('button','','×');del.type='button';del.setAttribute('aria-label','删除 '+w.word);del.onclick=()=>{if(confirm('删除 '+w.word+'？')){words=words.filter(item=>item.id!==w.id);session.pending=session.pending.filter(p=>p.id!==w.id);save();persist(SESSION_KEY,session);render();}};controls.append(del);en.append(controls);}
-   row.append(element('div','',w.definition),en);box.append(row);
+   row.append(markedText('div','',w.definition,markKey('word',w.id,'definition')),en);box.append(row);
   }target.append(box);
  }
 }
@@ -115,8 +117,8 @@ function renderCard(){
  if(preview){groupRows(todayWords(),$('today-list'));return;}if(speaking){renderSpeaking();return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
  if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':'本轮完成'));return;}
- content.append(element('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition));
- if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach(t=>ex.append(element('div','',t)));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
+ content.append(markedText('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition,markKey('word',w.id,flipped?'word':'definition')));
+ if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach((t,i)=>ex.append(markedText('div','',t,markKey('word',w.id,'example:'+i))));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
  $('card').setAttribute('aria-label',flipped?'英文答案':'中文题面');
 }
 function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const filtered=words.filter(w=>[w.word,w.definition,groupName(w)].join(' ').toLocaleLowerCase().includes(query));$('shown').textContent=filtered.length+' 词';groupRows(filtered,$('list'),true);}
@@ -272,9 +274,9 @@ function renderSpeaking(){
  const matches=speakingItems.filter(e=>[e.topic,e.question,e.answer].join(' ').toLocaleLowerCase().includes(query));
  if(!matches.length){list.append(element('div','empty','暂无题目'));return;}
  for(const entry of matches){const box=element('article','speaking-entry'),header=element('div','speaking-topic-line'),body=element('div','speaking-body');
- header.append(element('div','speaking-topic-title','题型：'+entry.topic));
+ header.append(markedText('div','speaking-topic-title','题型：'+entry.topic,markKey('speaking',entry.id,'topic')));
  const del=element('button','','×');del.type='button';del.setAttribute('aria-label','删除口语题 '+entry.question);del.onclick=()=>{if(confirm('删除这道口语题？')){speakingItems=speakingItems.filter(e=>e.id!==entry.id);const saved=saveSpeaking();renderSpeaking();$('review-count').textContent=speakingItems.length+' 题';toast(saved?'已删除':'删除仅在本次会话生效');}};
- header.append(del);body.append(element('h3','speaking-question',entry.question),element('p','speaking-answer',entry.answer));box.append(header,body);list.append(box);
+ header.append(del);body.append(markedText('h3','speaking-question',entry.question,markKey('speaking',entry.id,'question')),markedText('p','speaking-answer',entry.answer,markKey('speaking',entry.id,'answer')));box.append(header,body);list.append(box);
  }
 }
 function speakingImportMode(text){$('speaking-form').hidden=text;$('speaking-batch').hidden=!text;$('speaking-manual-tab').setAttribute('aria-pressed',String(!text));$('speaking-text-tab').setAttribute('aria-pressed',String(text));$('speaking-status').textContent='';}
@@ -312,8 +314,60 @@ $('speaking-file').onchange=async e=>{const file=e.target.files[0];if(!file)retu
 $('speaking-export').onclick=()=>download(JSON.stringify({version:1,speaking:speakingItems},null,2),'application/json','wordwell-part1-backup.json');
 window.addEventListener('storage',e=>{if(e.key===SPEAKING_KEY||e.key===null){readSpeaking();renderSpeaking();if(direction==='speaking')$('review-count').textContent=speakingItems.length+' 题';}});
 
+
+const MARKS_KEY='wordwell.red-marks.v1';
+let redMarks=new Map(),marksStorageOK=true,press=null,pressTimer;
+function markKey(type,id,field){return JSON.stringify([type,id,field]);}
+function validMarkRecord(record){return record&&typeof record.text==='string'&&Array.isArray(record.ranges)&&record.ranges.length<=2000&&record.ranges.every(r=>Number.isInteger(r.start)&&Number.isInteger(r.end)&&r.start>=0&&r.end>r.start&&r.end<=record.text.length);}
+function readMarks(){try{const raw=localStorage.getItem(MARKS_KEY);if(raw===null){redMarks=new Map();marksStorageOK=true;return;}const data=JSON.parse(raw);if(!Array.isArray(data)||!data.every(pair=>Array.isArray(pair)&&pair.length===2&&typeof pair[0]==='string'&&validMarkRecord(pair[1])))throw Error();redMarks=new Map(data);marksStorageOK=true;}catch(e){marksStorageOK=false;toast('红底标记读取失败，原数据未覆盖');}}
+function saveMarks(){if(!marksStorageOK){toast('标记仅本次生效，原有标记数据未覆盖');return false;}try{localStorage.setItem(MARKS_KEY,JSON.stringify([...redMarks]));return true;}catch(e){toast('红底仅在本次会话保留，存储空间不足');return false;}}
+function paintMarkedText(node,key,text){
+ node.classList.add('markable');node.dataset.markKey=key;node.dataset.markText=text;node.replaceChildren();
+ const record=redMarks.get(key),ranges=record?.text===text?record.ranges:[];let cursor=0;
+ for(const r of ranges){if(r.start<cursor)continue;if(r.start>cursor)node.append(document.createTextNode(text.slice(cursor,r.start)));node.append(element('mark','red-mark',text.slice(r.start,r.end)));cursor=r.end;}
+ if(cursor<text.length)node.append(document.createTextNode(text.slice(cursor)));
+}
+function markedText(tag,cls,text,key){const node=element(tag,cls);paintMarkedText(node,key,text);return node;}
+function tokenAt(text,offset){
+ if(!text.length)return null;offset=Math.max(0,Math.min(offset,text.length-1));
+ if(/\s/.test(text[offset])&&offset>0&&!/\s/.test(text[offset-1]))offset--;
+ if(/\s/.test(text[offset]))return null;
+ const latin=/[\p{Script=Latin}\p{M}\p{N}'’\-]/u;if(latin.test(text[offset])){let start=offset,end=offset+1;while(start>0&&latin.test(text[start-1]))start--;while(end<text.length&&latin.test(text[end]))end++;return {start,end};}
+ if(typeof Intl.Segmenter==='function'){for(const part of new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(text)){if(offset>=part.index&&offset<part.index+part.segment.length)return {start:part.index,end:part.index+part.segment.length};}}
+ const start=offset>0&&/[\uDC00-\uDFFF]/.test(text[offset])?offset-1:offset;return {start,end:start+(text.codePointAt(start)>0xffff?2:1)};
+}
+function toggleRedMark(node,start,end){
+ if(!node.isConnected)return;const key=node.dataset.markKey,text=node.dataset.markText;if(!text||start<0||end>text.length||start>=end)return;
+ const record=redMarks.get(key),ranges=record?.text===text?record.ranges:[];
+ const covered=ranges.some(r=>r.start<=start&&r.end>=end),next=[];
+ for(const r of ranges){if(r.end<=start||r.start>=end)next.push({...r});else{if(r.start<start)next.push({start:r.start,end:start});if(r.end>end)next.push({start:end,end:r.end});}}
+ if(!covered)next.push({start,end});next.sort((a,b)=>a.start-b.start);const merged=[];
+ for(const r of next){const last=merged[merged.length-1];if(last&&last.end>=r.start)last.end=Math.max(last.end,r.end);else merged.push({...r});}
+ if(merged.length>2000){toast('此段标记过多');return;}
+ if(merged.length)redMarks.set(key,{text,ranges:merged});else redMarks.delete(key);saveMarks();
+ for(const target of document.querySelectorAll('[data-mark-key]'))if(target.dataset.markKey===key&&target.dataset.markText===text)paintMarkedText(target,key,text);
+}
+function markAtPoint(node,x,y){
+ let caret=document.caretPositionFromPoint?.(x,y),range;
+ if(caret){range=document.createRange();range.setStart(caret.offsetNode,caret.offset);range.collapse(true);}else range=document.caretRangeFromPoint?.(x,y);
+ if(!range||!node.contains(range.startContainer))return;
+ const prefix=document.createRange();prefix.selectNodeContents(node);prefix.setEnd(range.startContainer,range.startOffset);
+ const token=tokenAt(node.dataset.markText,prefix.toString().length);if(token)toggleRedMark(node,token.start,token.end);
+}
+function cancelMarkPress(){clearTimeout(pressTimer);press=null;}
+document.addEventListener('pointerdown',e=>{
+ if(e.button!==0||!e.isPrimary)return;const node=e.target.closest?.('[data-mark-key]');if(!node)return;
+ cancelMarkPress();press={id:e.pointerId,node,x:e.clientX,y:e.clientY};
+ pressTimer=setTimeout(()=>{const active=press;if(!active)return;press=null;markAtPoint(active.node,active.x,active.y);},500);
+});
+document.addEventListener('pointermove',e=>{if(press&&e.pointerId===press.id&&Math.hypot(e.clientX-press.x,e.clientY-press.y)>10)cancelMarkPress();},{passive:true});
+for(const name of ['pointerup','pointercancel'])document.addEventListener(name,cancelMarkPress,{passive:true});
+document.addEventListener('contextmenu',e=>{if(e.target.closest?.('[data-mark-key]'))e.preventDefault();});
+window.addEventListener('blur',cancelMarkPress);
+window.addEventListener('storage',e=>{if(e.key===MARKS_KEY||e.key===null){readMarks();for(const node of document.querySelectorAll('[data-mark-key]'))paintMarkedText(node,node.dataset.markKey,node.dataset.markText);}});
+
 window.addEventListener('storage',e=>{if([KEY,PLAN_KEY,SESSION_KEY,'wordwell.daily-limit',null].includes(e.key)){dailyPlan=null;session=null;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit)){dailyLimit=limit;$('daily-limit').value=String(limit);}}catch(e){}read();render();}});
-function refresh(){readSpeaking();read();render();}
+function refresh(){readMarks();readSpeaking();read();render();}
 window.addEventListener('pageshow',refresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});setInterval(render,60000);
-readSpeaking();read();render();
+readMarks();readSpeaking();read();render();
 </script></body></html>
