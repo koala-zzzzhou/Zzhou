@@ -1,101 +1,122 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#244c3c">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="description" content="A quiet place for words to become part of you. Private, spaced-repetition flashcards.">
-<title>Wordwell — A little practice, a lasting vocabulary</title>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#244c3c"><meta name="apple-mobile-web-app-capable" content="yes"><title>Wordwell · 单词本</title>
 <style>
-:root{color-scheme:light;--ink:#243e33;--muted:#70766d;--paper:#f6f5ef;--line:#dedfd5;--green:#244c3c;--lime:#deedb4;--white:#fffefa;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink)}button,input,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:default}button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #9cbe65;outline-offset:4px}header{height:88px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 6vw;gap:16px}.brand{font-family:Georgia,serif;font-size:29px;letter-spacing:-1px}.brand span{display:inline-grid;place-items:center;width:33px;height:33px;border:1px solid var(--green);border-radius:50%;font-size:23px;margin-right:10px}.header-right{display:flex;align-items:center;gap:22px}.private{font-size:12px;color:var(--muted)}button{border:1px solid var(--line);background:transparent;color:var(--ink);padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600}.solid{background:var(--green);color:white;border-color:var(--green)}.soft{background:var(--lime);border-color:var(--lime)}main{max-width:1240px;margin:auto;padding:46px 40px 25px}.eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:10px;font-weight:700;color:var(--muted)}.intro{display:flex;align-items:end;justify-content:space-between;gap:25px;margin-bottom:32px}h1{font:normal clamp(34px,4.5vw,53px)/1.15 Georgia,serif;letter-spacing:-1.7px;margin:12px 0}p{color:var(--muted);font-size:14px;line-height:1.7;margin:0}.date{font-size:12px;color:var(--muted);white-space:nowrap;padding-bottom:8px}.stats{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:13px;background:#efefe6;margin-bottom:33px}.stat{padding:20px 26px;display:flex;align-items:center;gap:17px}.stat+.stat{border-left:1px solid var(--line)}.stat strong{font:32px Georgia,serif}.stat span{font-size:12px;color:var(--muted)}.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:17px}h2{font:24px Georgia,serif;margin:0}.pill{font-size:10px;background:#e9eddf;border-radius:20px;padding:6px 10px;color:#526844}.card{border-radius:16px;background:var(--green);color:#fff;min-height:322px;position:relative;padding:25px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;cursor:pointer;width:100%;border:0;font-weight:400}.card:before,.card:after{content:"";position:absolute;width:300px;height:300px;border:1px solid #ffffff0e;border-radius:50%;right:-155px;bottom:-190px}.card:after{width:400px;height:400px;right:-205px;bottom:-240px}.card-top{position:absolute;top:22px;left:25px;right:25px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:1.3px;color:#c4d1bd}.card-word{font:clamp(30px,5vw,47px)/1.2 Georgia,serif;margin:20px 0;overflow-wrap:anywhere}.card-definition{font:24px/1.5 Georgia,serif;white-space:pre-wrap;overflow-wrap:anywhere;max-height:180px;overflow:auto}.card-bottom{position:absolute;bottom:23px;left:0;right:0;font-size:11px;color:#b9cbbb}.card-tags{color:#caddb9;font-size:11px}.review-help{text-align:center;font-size:11px;margin:14px 0}.ratings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.ratings button{background:var(--white);padding:13px 5px}.ratings small{display:block;font-size:10px;font-weight:400;color:var(--muted);margin-top:4px}.side{background:var(--white);border:1px solid var(--line);border-radius:13px;padding:23px;height:fit-content}label{display:block;font-size:11px;font-weight:650;margin-top:18px;margin-bottom:7px}input,textarea{width:100%;border:1px solid var(--line);border-radius:7px;background:#fcfcf8;padding:11px 12px;color:var(--ink);font-size:13px;outline:none}input:focus,textarea:focus{border-color:#63865b;box-shadow:0 0 0 2px #63865b22}textarea{resize:vertical;min-height:88px}.side .solid{width:100%;margin-top:19px}.hint{font-size:10px;line-height:1.6;margin-top:12px}.library{margin-top:32px}.tools{display:flex;gap:10px;margin:15px 0}.tools input{background:var(--white)}.list{border-top:1px solid var(--line)}.word-row{display:flex;align-items:center;gap:15px;border-bottom:1px solid var(--line);padding:17px 2px}.word-info{min-width:0;flex:1}.word-title{font:19px Georgia,serif;overflow-wrap:anywhere}.word-desc{font-size:12px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.tag{font-size:9px;background:#e9eddf;border-radius:4px;padding:3px 6px}.due{font-size:10px;color:var(--muted);white-space:nowrap}.delete{padding:7px 9px;font-weight:400;border:0;color:#887d6b}.empty{padding:30px 5px;color:var(--muted);font-size:13px}.note{border-left:2px solid #b3c88b;margin-top:25px;padding-left:15px}.note h3{font:17px Georgia,serif;margin:0 0 7px}.note p{font-size:11px}footer{margin-top:30px;padding:23px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;font-size:10px;color:var(--muted)}dialog{width:min(500px,calc(100% - 30px));border:1px solid var(--line);border-radius:16px;padding:28px;background:var(--white);color:var(--ink)}dialog::backdrop{background:#18302577}dialog p{margin:15px 0;font-size:13px}dialog button{margin:5px 5px 0 0}.notice{padding:10px 15px;background:#f4dfca;font-size:12px;border-radius:7px;margin-bottom:20px}#toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:12px 20px;border-radius:8px;font-size:12px;z-index:10;max-width:90vw}#toast:empty{display:none}[hidden]{display:none!important}@media(max-width:850px){main{padding:30px 24px}.layout{grid-template-columns:minmax(0,1fr) 280px;gap:20px}.private{display:none}.stat{padding:18px}.intro .date{display:none}}@media(max-width:640px){header{height:74px;padding:0 20px}.brand{font-size:25px}.header-right{gap:0}header button{padding:9px 12px}main{padding:28px 20px}.intro{margin-bottom:25px}h1{font-size:38px}.stats{margin-bottom:26px}.stat{display:block;padding:15px 13px}.stat strong{display:block;font-size:28px;margin-bottom:5px}.stat span{font-size:10px}.layout{display:flex;flex-direction:column}.side{margin-top:5px}.card{min-height:300px}.library{margin-top:26px}footer{flex-direction:column}.word-row{gap:8px}}@media(prefers-reduced-motion:no-preference){button{transition:background .15s,transform .15s}button:active{transform:translateY(1px)}}
+:root{--ink:#243e33;--muted:#737c70;--green:#244c3c;--paper:#f6f5ef;--line:#dedfd5;--lime:#deedb4;font-family:system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--paper);color-scheme:light}*{box-sizing:border-box}body{margin:0}button,input,textarea{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:11px 16px;color:var(--ink);background:#fffefa}button:disabled{opacity:.4;cursor:default}button:focus-visible,a:focus-visible{outline:3px solid #a4be78;outline-offset:3px}[hidden]{display:none!important}.solid,button[aria-pressed="true"]{background:var(--green);color:white;border-color:var(--green)}header{max-width:1440px;margin:auto;padding:23px 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{font:28px Georgia,serif}header .metrics{font-size:12px;display:flex;gap:20px;color:var(--muted)}header strong{font-size:18px;color:var(--ink);margin-right:5px}main{max-width:1440px;padding:25px 32px 120px;margin:auto}.layout{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:24px;align-items:start}.section-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:16px}h2{font-size:18px;margin:0}h3{font-size:14px;margin:0}.pill{font-size:12px;color:var(--muted)}.direction-switch{display:flex;gap:8px;margin-bottom:16px}.direction-switch button{font-size:13px}.card{width:100%;min-height:330px;padding:35px;background:var(--green);color:#fff;border:0;display:grid;place-items:center}.card-word{font:38px/1.5 Georgia,serif;overflow-wrap:anywhere}.card-definition{font-size:28px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.card-content{max-width:100%;max-height:420px;overflow:auto}.examples{font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:10px}.lookup-credit{font-size:10px;color:var(--muted);margin-top:8px}.lookup-credit a{color:inherit}.score-panel{position:sticky;top:20px;background:#fffefa;border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:12px}.ratings{display:grid;gap:12px}.ratings button{min-height:72px;font-size:20px}.ratings button:last-child{background:var(--lime);border-color:var(--lime)}#undo-review{font-size:12px;background:transparent}#queue-status{font-size:12px;color:var(--muted);white-space:pre-wrap}.group-grid{display:grid;gap:12px}.group-box{background:#fffefa;border:1px solid var(--line);border-radius:11px;overflow:hidden}.group-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;background:#e9eddf}.group-count{font-size:11px;color:var(--muted)}.group-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;padding:7px 14px;border-top:1px solid #eeeee6;font-size:12px;line-height:1.5;align-items:start}.group-row>div{overflow-wrap:anywhere;white-space:pre-wrap}.group-row .english{display:flex;align-items:start;justify-content:space-between;gap:8px}.row-actions{display:flex;gap:5px;flex-shrink:0}.row-actions button{padding:1px 5px;font-size:11px;background:transparent;border:0;color:var(--muted)}.mastered{font-size:10px;color:#608240}.library{margin-top:28px}.tools{margin:12px 0}input,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:7px;background:#fffefa;color:var(--ink);font-size:13px}textarea{resize:vertical;min-height:90px}label{display:block;font-size:12px;font-weight:600;margin:15px 0 7px}.empty{font-size:14px;color:var(--muted);padding:24px 0}.floating-actions{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));display:flex;gap:8px;z-index:5;padding:8px;background:#f6f5efe8;border:1px solid var(--line);border-radius:14px;box-shadow:0 5px 22px #243e3310}.floating-actions button{font-size:12px;padding:12px}.lookup-button{width:100%;margin-top:10px;background:var(--lime)}#lookup-status,#backup-status{font-size:12px;white-space:pre-wrap;margin-top:12px}.lookup-preview{font-size:12px;line-height:1.6}.lookup-preview ol{padding-left:20px}dialog{border:1px solid var(--line);border-radius:14px;padding:23px;background:var(--paper);color:var(--ink);width:min(600px,calc(100% - 24px));max-height:90dvh;overflow:auto}dialog::backdrop{background:#18302577}.dialog-header{display:flex;justify-content:space-between;align-items:center}.dialog-header button{padding:4px 10px}.side .solid{width:100%;margin-top:20px}.backup-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}.backup-actions a{color:var(--ink);font-size:12px}#backup-text{min-height:180px;font:12px/1.5 monospace}#toast{position:fixed;left:50%;bottom:95px;transform:translateX(-50%);padding:10px 16px;max-width:90vw;background:var(--green);color:white;font-size:12px;border-radius:8px;z-index:20}#toast:empty{display:none}.notice{padding:12px;background:#f4dfca;border-radius:8px;font-size:12px;margin-bottom:16px}
+@media(min-width:1500px){.group-row{font-size:13px}}@media(max-width:640px){header{padding:18px 16px}.brand{font-size:24px}header .metrics{gap:9px;font-size:10px}header strong{font-size:15px}main{padding:20px 16px 120px}.layout{grid-template-columns:minmax(0,1fr) 100px;gap:10px}.section-head{align-items:start;flex-direction:column;gap:5px}.score-panel{padding:8px;gap:8px;top:10px}.ratings{gap:8px}.ratings button{padding:8px 3px;font-size:16px;min-height:64px}#undo-review{padding:8px 2px;font-size:10px}.direction-switch{flex-wrap:wrap}.direction-switch button{padding:8px;font-size:11px}.card{min-height:290px;padding:15px}.card-word{font-size:25px}.card-definition{font-size:20px}.group-row{font-size:11px;gap:10px;padding:7px 10px}.group-heading{padding:10px}.group-heading h3{font-size:12px}.floating-actions{gap:5px;padding:6px}.floating-actions button{padding:10px}.row-actions{gap:0}}
+</style></head><body>
+<header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
+<main><div id="storage-warning" class="notice" role="alert" hidden></div>
+<div class="layout"><section><div class="section-head"><h2>今日复习</h2><span id="review-count" class="pill"></span></div><div class="direction-switch" role="group" aria-label="练习方式"><button id="en-zh" aria-pressed="true">今日预览</button><button id="zh-en" aria-pressed="false">看中文 → 想英文</button></div><section id="today-preview"><div id="today-list" class="group-grid"></div></section><button id="card" class="card" aria-label="翻卡" hidden><span id="card-content" class="card-content"></span></button></section>
+<aside id="score-panel" class="score-panel"><div id="ratings" class="ratings"><button data-grade="again" disabled>忘记了</button><button data-grade="good" disabled>记得</button></div><div id="queue-status" role="status"></div><button id="undo-review" hidden>↶ 撤销评分</button></aside></div>
+<section class="library"><div class="section-head"><h2>词库</h2><span id="shown" class="pill"></span></div><div class="tools"><input id="search" type="search" aria-label="搜索词库" placeholder="搜索"></div><div id="list" class="group-grid"></div></section></main>
+<nav class="floating-actions" aria-label="词库操作"><button id="single-import">单个导入</button><button id="import">批量导入</button><button id="export">导出</button></nav>
+<dialog id="single-dialog" aria-labelledby="single-title"><div class="dialog-header"><h2 id="single-title">单个导入</h2><button id="single-close" type="button" aria-label="关闭">×</button></div><form class="side" id="add-form"><label for="word">英文</label><input id="word" required maxlength="120" autocomplete="off"><button id="lookup" class="lookup-button" type="button">查释义与例句</button><p id="lookup-status" role="status"></p><div id="lookup-preview" class="lookup-preview"></div><label for="definition">中文</label><textarea id="definition" required maxlength="2000"></textarea><label for="examples">例句</label><textarea id="examples" maxlength="4000"></textarea><div id="example-credit" hidden></div><label for="tags">单元 / 分类</label><input id="tags" maxlength="200"><button class="solid" type="submit">保存</button></form></dialog>
+<dialog id="backup-dialog" aria-labelledby="backup-title"><div class="dialog-header"><h2 id="backup-title">批量导入</h2><button id="backup-close" type="button" aria-label="关闭">×</button></div><div id="bulk-unit-area"><label for="bulk-unit">单元 / 分类</label><input id="bulk-unit" maxlength="200"></div><div id="backup-file-area"><label for="backup-file">文件</label><input id="backup-file" type="file" accept=".json,.txt,.tsv,.csv,application/json,text/plain"></div><label for="backup-text">内容</label><textarea id="backup-text" spellcheck="false" placeholder="英文&#9;中文"></textarea><p id="backup-status" role="status" aria-live="polite"></p><div class="backup-actions"><a id="backup-download" download="wordwell-backup.json">下载 JSON</a><button id="backup-copy">复制</button><button id="backup-merge" class="solid">导入</button></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div><script id="offline-seed" type="application/json">[]</script><script>
 
-.direction-switch{display:flex;gap:8px;margin:0 0 15px;flex-wrap:wrap}.direction-switch button[aria-pressed="true"]{background:var(--green);color:white;border-color:var(--green)}
-#backup-dialog{width:min(640px,calc(100% - 30px))}#backup-text{min-height:190px;font:12px/1.6 ui-monospace,monospace}#backup-status{white-space:pre-wrap;color:var(--ink)}.backup-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:15px}.backup-actions a{color:var(--green);padding:10px;text-decoration:underline}#backup-file{display:block;margin:10px 0}dialog label{font-size:13px}
-
-.lookup-button{width:100%;margin-top:10px;background:var(--lime);border-color:var(--lime)}#lookup-status{font-size:12px;margin-top:10px;white-space:pre-wrap}.lookup-preview{font-size:12px;line-height:1.7;margin-top:10px}.lookup-preview ol{padding-left:20px}.lookup-preview a,.examples a{color:inherit}.examples{margin-top:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}.examples summary{cursor:pointer}.card #card-content{max-width:100%;min-width:0}.card #card-content .examples{text-align:left;max-height:100px;overflow:auto;color:#e2eddb}.card{padding-top:55px;padding-bottom:55px}.lookup-credit{font-size:10px;color:var(--muted);margin-top:8px}
-
-.today-intro{padding:20px 22px;background:#e9eddf;border-radius:12px 12px 0 0;border:1px solid var(--line)}.today-intro h3{font-size:17px;margin:0 0 8px}.today-intro p{font-size:12px}.today-list{list-style:none;padding:0;margin:0 0 16px;counter-reset:today;border:1px solid var(--line);border-top:0;border-radius:0 0 12px 12px;background:var(--white)}.today-item{counter-increment:today;display:flex;gap:15px;padding:20px 22px}.today-item+.today-item{border-top:1px solid var(--line)}.today-item:before{content:counter(today,decimal-leading-zero);font-size:11px;color:var(--muted);padding-top:6px}.today-body{min-width:0;flex:1}.today-word{font:24px/1.4 Georgia,serif;overflow-wrap:anywhere}.today-definition{font-size:15px;line-height:1.8;margin-top:7px;white-space:pre-wrap;overflow-wrap:anywhere}#start-recall{width:100%}
-</style>
-</head>
-<body>
-<header><div class="brand"><span aria-hidden="true">❧</span>wordwell<span style="border:0;width:auto;font:10px system-ui;letter-spacing:1px;margin:0 0 0 12px;color:#818774">WORDBOOK</span></div><div class="header-right"><span class="private">◌ &nbsp; Yours. On this device.</span><button id="install">↗ &nbsp; Take it with you</button></div></header>
-<main>
-<div id="storage-warning" class="notice" hidden role="alert"></div>
-<section class="intro"><div><div class="eyebrow">Small steps. Lasting knowledge.</div><h1>Make room for new words.</h1><p>A little curiosity, a little practice. A vocabulary that stays with you.</p></div><div class="date" id="today"></div></section>
-<div class="stats" aria-label="Wordbook statistics"><div class="stat"><strong id="total">0</strong><span>words collected</span></div><div class="stat"><strong id="due-count">0</strong><span>ready to review</span></div><div class="stat"><strong id="learned">0</strong><span>growing stronger</span></div></div>
-<div class="layout"><div><section aria-labelledby="review-title"><div class="section-head"><h2 id="review-title">Your daily practice</h2><span class="pill" id="review-count">A fresh start</span></div><div class="direction-switch" role="group" aria-label="闪卡练习方向"><button type="button" id="en-zh" aria-pressed="true">今日单词预览</button><button type="button" id="zh-en" aria-pressed="false">看中文 → 想英文</button></div><section id="today-preview" aria-labelledby="today-title" hidden><div class="today-intro"><h3 id="today-title">今日学习 · 每天最多 100 个</h3><p>英文和中文一起看，每天最多安排 100 个不同单词。优先安排到期词；当天清单固定，剩余单词留到之后学习。预览不改变复习进度。</p></div><ol id="today-list" class="today-list"></ol><p id="today-empty" class="empty" hidden>今天没有待复习的单词。新添加的单词会立即出现在这里。</p><button id="start-recall" class="solid" type="button">看完了，开始看中文想英文 →</button></section><button class="card" id="card" aria-label="Flashcard. Tap to reveal definition"><span class="card-top"><span id="card-type">WORD / DEFINITION</span><span>✧</span></span><span id="card-content"></span><span class="card-bottom" id="flip-hint">↻ &nbsp; Tap the card to reveal</span></button><p class="review-help" id="review-help">Try to recall the meaning, then turn the card.</p><div class="ratings" id="ratings" hidden><button data-grade="again">Again<small>In 10 minutes</small></button><button data-grade="hard">Almost<small id="hard-time">One step back</small></button><button data-grade="good" class="soft">Got it<small id="good-time">Next interval</small></button></div><div id="undo-area" hidden style="margin-top:12px"><button id="undo-review" type="button">↶ 撤销上次评分</button><p class="hint">点错了可以撤销，本次打开页面内可连续撤销；刷新或关闭页面后记录会清除。</p></div></section>
-<section class="library" aria-labelledby="library-title"><div class="section-head"><h2 id="library-title">Your collection</h2><span class="eyebrow" id="shown"></span></div><div class="tools"><input id="search" type="search" aria-label="Search words, definitions or tags" placeholder="⌕  Search words, meanings, or tags…"></div><div class="list" id="list"></div></section></div>
-<aside><form class="side" id="add-form"><div class="eyebrow">A new discovery</div><h2 style="margin-top:9px">Keep a word.</h2><label for="word">英文单词 / 短语</label><input id="word" name="word" placeholder="e.g. serendipity" required maxlength="120" autocomplete="off"><button type="button" id="lookup" class="lookup-button">⌕ 查中文释义和例句</button><p id="lookup-status" role="status" aria-live="polite"></p><div id="lookup-preview" class="lookup-preview"></div><p class="hint">联网查询会将输入的单词发送给免费词典及 MyMemory 翻译服务。结果可修改，确认后再保存。</p><label for="definition">中文释义</label><textarea id="definition" name="definition" placeholder="填写中文意思，例如：意外发现美好事物的幸运" required maxlength="2000"></textarea><label for="examples">英文例句（每行一句，可修改）</label><textarea id="examples" placeholder="查询后自动填入词典例句，也可以自行填写。" maxlength="4000"></textarea><div id="example-credit" class="lookup-credit" hidden>词典内容来源：Free Dictionary API / Wiktionary；使用时请保留来源与许可链接。</div><label for="tags">Tags <span style="font-weight:400;color:var(--muted)">· optional</span></label><input id="tags" name="tags" placeholder="reading, everyday, favorites" maxlength="200"><p class="hint">Separate tags with commas.</p><button class="solid" type="submit">+ &nbsp; 添加到单词本</button><p class="hint">Saved on this device. No account. No distractions.</p></form><div class="note"><h3>Better timing. Better memory.</h3><p>Review just before a word slips away. Our Ebbinghaus-inspired intervals grow from 1 to 180 days as your recall improves.</p></div></aside></div>
-<footer><span>Grow your vocabulary, one good word at a time.</span><div><button id="export" style="padding:5px 9px;font-size:10px">导出备份</button> <button id="import" style="padding:5px 9px;font-size:10px">导入备份</button><input type="file" id="import-file" accept="application/json,.json" hidden></div></footer>
-</main>
-<dialog id="install-dialog"><h2>Your words, wherever you go.</h2><p id="install-text">On iPhone or iPad, open this page in Safari, tap Share, then Add to Home Screen. On Android, use your browser’s Add to Home screen menu.</p><p>This single-file edition has no service worker. A home-screen shortcut alone does not guarantee an offline launch. Download an offline copy below: it includes your current collection and works without a network. Download a fresh copy or export a backup after making changes.</p><p>Data stays in each browser or file’s local storage; it is not synced. Some browsers restrict storage for local files. Keep JSON backups of important words.</p><button class="solid" id="download">Download offline copy</button><button id="close-dialog">Close</button></dialog>
-<dialog id="backup-dialog" aria-labelledby="backup-title">
-<h2 id="backup-title">备份单词本</h2>
-<p id="backup-help"></p>
-<div id="backup-file-area" hidden><label for="backup-file">选择 Wordwell JSON 备份文件</label><input type="file" id="backup-file" accept="application/json,.json"><p class="hint">无法打开文件选择器时，也可以直接粘贴下方文本。</p></div>
-<label for="backup-text">JSON 备份内容</label><textarea id="backup-text" spellcheck="false"></textarea>
-<p id="backup-status" role="status" aria-live="polite"></p>
-<div class="backup-actions"><a id="backup-download" download="wordwell-backup.json">下载 JSON 文件</a><button type="button" id="backup-copy">复制备份文本</button><button type="button" id="backup-merge" class="solid" hidden>确认导入（合并，不覆盖已有单词）</button><button type="button" id="backup-close">关闭</button></div>
-</dialog>
-<div id="toast" role="status" aria-live="polite"></div>
-<script id="offline-seed" type="application/json">[]</script>
-<script>
 'use strict';
-const KEY='wordwell.v1', DAY=86400000, INTERVALS=[1,3,7,14,30,90,180];
-const $=id=>document.getElementById(id);
-let words=[],currentId=null,flipped=false,installPrompt=null,toastTimer,storageOK=true;
-let direction='en-zh',backupURL=null;
+const KEY='wordwell.v1',DAY=86400000,INTERVALS=[1,2,4,7,15,30,60,90,180],DAILY_LIMIT=100,PLAN_KEY='wordwell.daily-plan.v1',SESSION_KEY='wordwell.review-session.v2';
+const $=id=>document.getElementById(id),clone=value=>JSON.parse(JSON.stringify(value));
+let words=[],currentId=null,flipped=false,storageOK=true,toastTimer,backupURL=null,direction='en-zh',dailyPlan=null,session=null;
 const reviewHistory=[];
 try{if(localStorage.getItem('wordwell.direction')==='zh-en')direction='zh-en';}catch(e){}
-function setDirection(value){direction=value;flipped=false;try{localStorage.setItem('wordwell.direction',value);}catch(e){toast('练习方向仅在本次会话保留。');}renderCard();}
-$('en-zh').onclick=()=>setDirection('en-zh');
-$('zh-en').onclick=()=>setDirection('zh-en');
-$('start-recall').onclick=()=>{setDirection('zh-en');$('zh-en').focus();};
-function valid(w){return w&&typeof w.id==='string'&&w.id.length>0&&typeof w.word==='string'&&w.word.trim().length>0&&w.word.length<=120&&typeof w.definition==='string'&&w.definition.trim().length>0&&w.definition.length<=2000&&Array.isArray(w.tags)&&w.tags.length<=20&&w.tags.every(t=>typeof t==='string'&&t.length<=200)&&Number.isInteger(w.stage)&&w.stage>=0&&w.stage<=INTERVALS.length&&Number.isFinite(w.due)&&w.due>=0&&Number.isFinite(w.created)&&w.created>=0&&(w.examples===undefined||(Array.isArray(w.examples)&&w.examples.length<=10&&w.examples.every(t=>typeof t==='string'&&t.length<=4000)))&&(w.dictionarySource===undefined||typeof w.dictionarySource==='boolean');}
-function warn(message){$('storage-warning').hidden=false;$('storage-warning').textContent=message;}
-function read(){try{const raw=localStorage.getItem(KEY);const parsed=JSON.parse(raw===null?$('offline-seed').textContent:raw);if(!Array.isArray(parsed)||!parsed.every(valid)||new Set(parsed.map(w=>w.id)).size!==parsed.length)throw Error('Invalid data');words=parsed;}catch(e){storageOK=false;warn('Saved data could not be read. It has not been overwritten. Export any available words and restore a valid backup; changes are session-only until then.');}}
-function save(){if(!storageOK)return false;try{localStorage.setItem(KEY,JSON.stringify(words));return true;}catch(e){warn('This browser could not save your changes. Keep this page open and export a backup now.');return false;}}
-function toast(message){$('toast').textContent=message;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').textContent='',4000);}
-const DAILY_LIMIT=100,PLAN_KEY='wordwell.daily-plan.v1';
-let dailyPlan=null;
-function localDay(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
-function todayWords(){
-  const day=localDay();
-  if(!dailyPlan||dailyPlan.day!==day){
-    if(dailyPlan){reviewHistory.length=0;currentId=null;flipped=false;}
-    dailyPlan={day,ids:[]};
-    try{const stored=JSON.parse(localStorage.getItem(PLAN_KEY));if(stored&&stored.day===day&&Array.isArray(stored.ids)&&stored.ids.length<=DAILY_LIMIT&&stored.ids.every(id=>typeof id==='string')&&new Set(stored.ids).size===stored.ids.length)dailyPlan=stored;}catch(e){}
-  }
-  const tomorrow=new Date();tomorrow.setHours(24,0,0,0);
-  const ids=new Set(dailyPlan.ids);
-  const candidates=words.filter(w=>!ids.has(w.id)&&w.due<tomorrow.getTime()).sort((a,b)=>a.due-b.due||a.created-b.created);
-  const additions=candidates.slice(0,Math.max(0,DAILY_LIMIT-dailyPlan.ids.length));
-  if(additions.length){dailyPlan.ids.push(...additions.map(w=>w.id));try{localStorage.setItem(PLAN_KEY,JSON.stringify(dailyPlan));}catch(e){warn('今日清单暂时无法保存；刷新后可能重新安排，但每次仍最多 100 个。');}}
-  const byId=new Map(words.map(w=>[w.id,w]));
-  return dailyPlan.ids.map(id=>byId.get(id)).filter(Boolean);
-}
-function dueWords(){return todayWords().filter(w=>w.due<=Date.now()).sort((a,b)=>a.due-b.due||a.created-b.created);}
+function localDay(time=Date.now()){const d=new Date(time);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function midnight(time=Date.now()){const d=new Date(time);d.setHours(0,0,0,0);return d.getTime();}
+function calendarDays(time,days){const d=new Date(time);d.setDate(d.getDate()+days);d.setHours(0,0,0,0);return d.getTime();}
 function element(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
-function intervalLabel(days){return days===1?'In 1 day':`In ${days} days`;}
-function renderTodayPreview(){
-  const today=todayWords();
-  $('review-count').textContent=`今日 ${today.length} / ${DAILY_LIMIT} 个单词`;
-  $('today-empty').hidden=today.length>0;
-  const list=$('today-list');list.replaceChildren();list.hidden=!today.length;
-  for(const w of today){
-    const row=element('li','today-item'),body=element('div','today-body');
-    body.append(element('div','today-word',w.word),element('div','today-definition',w.definition));
-    if(w.tags.length){const tags=element('div','tags');w.tags.forEach(t=>tags.append(element('span','tag',t)));body.append(tags);}
-    if(w.examples?.length){const details=element('details','examples');details.append(element('summary','','查看例句'));w.examples.forEach(t=>details.append(element('div','',t)));if(w.dictionarySource)details.append(dictionaryCredit(w.word));body.append(details);}
-    row.append(body);list.append(row);
-  }
+function valid(w){return w&&typeof w.id==='string'&&w.id.length>0&&typeof w.word==='string'&&w.word.trim().length>0&&w.word.length<=120&&typeof w.definition==='string'&&w.definition.trim().length>0&&w.definition.length<=2000&&Array.isArray(w.tags)&&w.tags.length<=20&&w.tags.every(t=>typeof t==='string'&&t.length<=200)&&Number.isInteger(w.stage)&&w.stage>=0&&w.stage<=9&&Number.isFinite(w.due)&&w.due>=0&&Number.isFinite(w.created)&&w.created>=0&&(w.examples===undefined||(Array.isArray(w.examples)&&w.examples.length<=10&&w.examples.every(t=>typeof t==='string'&&t.length<=4000)))&&(w.mastered===undefined||typeof w.mastered==='boolean')&&(w.reinforcement===undefined||w.reinforcement===null||(Number.isFinite(w.reinforcement.anchor)&&w.reinforcement.anchor>=0&&Number.isInteger(w.reinforcement.step)&&w.reinforcement.step>=0&&w.reinforcement.step<=2));}
+function warn(text){$('storage-warning').hidden=false;$('storage-warning').textContent=text;}
+function toast(text){$('toast').textContent=text;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').textContent='',3500);}
+function persist(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(e){warn('保存失败，请导出备份。');return false;}}
+function save(){return storageOK&&persist(KEY,words);}
+function read(){try{const raw=localStorage.getItem(KEY),data=JSON.parse(raw===null?$('offline-seed').textContent:raw);if(!Array.isArray(data)||!data.every(valid)||new Set(data.map(w=>w.id)).size!==data.length)throw Error();words=data;}catch(e){storageOK=false;warn('无法读取存储，原数据未覆盖。');}}
+function eligible(w){return !w.mastered&&w.due<=Date.now();}
+function ensureDay(){
+ const day=localDay();if(dailyPlan?.day===day&&session?.day===day)return;
+ reviewHistory.length=0;currentId=null;flipped=false;dailyPlan={day,ids:[]};session={day,count:0,pending:[]};
+ try{const p=JSON.parse(localStorage.getItem(PLAN_KEY));if(p?.day===day&&Array.isArray(p.ids)&&p.ids.length<=DAILY_LIMIT&&p.ids.every(id=>typeof id==='string')&&new Set(p.ids).size===p.ids.length)dailyPlan=p;}catch(e){}
+ try{const q=JSON.parse(localStorage.getItem(SESSION_KEY));if(q?.day===day&&Number.isSafeInteger(q.count)&&q.count>=0&&Array.isArray(q.pending)&&q.pending.every(p=>typeof p.id==='string'&&Number.isSafeInteger(p.readyAt)&&p.readyAt>=0)&&new Set(q.pending.map(p=>p.id)).size===q.pending.length)session=q;}catch(e){}
 }
-function renderCard(){$('undo-area').hidden=direction!=='zh-en'||reviewHistory.length===0;$('en-zh').setAttribute('aria-pressed',String(direction==='en-zh'));$('zh-en').setAttribute('aria-pressed',String(direction==='zh-en'));const preview=direction==='en-zh';$('today-preview').hidden=!preview;$('card').hidden=preview;$('review-help').hidden=preview;if(preview){$('ratings').hidden=true;renderTodayPreview();return;}const due=dueWords();let w=due.find(w=>w.id===currentId);if(!w){w=due[0];currentId=w?w.id:null;flipped=false;}$('review-count').textContent=`今日 ${todayWords().length} / ${DAILY_LIMIT} · 待复习 ${due.length}`;const content=$('card-content');content.replaceChildren();$('card').disabled=!w;$('ratings').hidden=!w||!flipped;$('flip-hint').hidden=!w;$('card-type').textContent=direction==='en-zh'?(flipped?'中文释义 · 答案':'英文 · 请回想中文'):(flipped?'英文 · 答案':'中文 · 请回想英文');if(!w){content.append(element('div','card-word',words.length?'A little progress, every day.':'A word is a beginning.'));content.append(element('div','card-tags',words.length?'今天这批已到期的单词已复习完。未到期的稍后再来，其余单词留到之后学习。':'Add your first discovery to begin your collection.'));$('review-help').textContent=words.length?'Your next review will appear here automatically.':'Your first word will be ready to review immediately.';return;}const showDefinition=direction==='en-zh'?flipped:!flipped;content.append(element('div',showDefinition?'card-definition':'card-word',showDefinition?w.definition:w.word));if(flipped&&w.examples?.length){const box=element('div','examples');box.append(element('div','','例句'));w.examples.forEach(t=>box.append(element('div','',t)));content.append(box);}if(w.tags.length)content.append(element('div','card-tags',w.tags.join(' · ')));$('card').setAttribute('aria-label',flipped?'答案，点击返回题面':'点击翻卡查看答案');$('flip-hint').textContent=flipped?'↻  点击返回题面':'↻  点击翻卡查看答案';$('review-help').textContent=flipped?'回想得怎么样？请选择下方记忆程度。':direction==='en-zh'?'看英文，先自己说出中文意思，再点击翻卡。':'看中文，先自己说出英文单词，再点击翻卡。';$('hard-time').textContent=intervalLabel(INTERVALS[Math.max(0,w.stage-1)]);$('good-time').textContent=intervalLabel(INTERVALS[Math.min(w.stage,INTERVALS.length-1)]);}
-function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const matches=words.filter(w=>[w.word,w.definition,...w.tags].join(' ').toLocaleLowerCase().includes(query)).sort((a,b)=>b.created-a.created);$('shown').textContent=`${matches.length} ${matches.length===1?'word':'words'}`;const list=$('list');list.replaceChildren();if(!matches.length){list.append(element('div','empty',query?'No matches. Try another word or tag.':'Nothing here yet. Good words are worth keeping.'));return;}for(const w of matches){const row=element('div','word-row'),info=element('div','word-info');info.append(element('div','word-title',w.word),element('div','word-desc',w.definition));if(w.examples?.length){const details=element('details','examples');details.append(element('summary','','查看例句'));w.examples.forEach(t=>details.append(element('div','',t)));if(w.dictionarySource)details.append(dictionaryCredit(w.word));info.append(details);}if(w.tags.length){const tags=element('div','tags');w.tags.forEach(t=>tags.append(element('span','tag',t)));info.append(tags);}const due=element('span','due',w.due<=Date.now()?'Ready now':new Date(w.due).toLocaleDateString(undefined,{month:'short',day:'numeric'}));const del=element('button','delete','×');del.type='button';del.setAttribute('aria-label',`Delete ${w.word}`);del.onclick=()=>{if(confirm(`Delete “${w.word}” from your wordbook?`)){words=words.filter(item=>item.id!==w.id);const saved=save();render();toast(saved?'Word removed.':'Removed for this session. Export a backup.');}};row.append(info,due,del);list.append(row);}}
-function render(){$('total').textContent=words.length;$('due-count').textContent=dueWords().length;$('learned').textContent=words.filter(w=>w.stage>=4).length;renderCard();renderList();}
-
+function todayWords(){
+ ensureDay();const ids=new Set(dailyPlan.ids);
+ const additions=words.filter(w=>eligible(w)&&!ids.has(w.id)).sort((a,b)=>a.due-b.due||a.created-b.created||a.id.localeCompare(b.id)).slice(0,DAILY_LIMIT-dailyPlan.ids.length);
+ if(additions.length){dailyPlan.ids.push(...additions.map(w=>w.id));persist(PLAN_KEY,dailyPlan);}
+ const byId=new Map(words.map(w=>[w.id,w]));return dailyPlan.ids.map(id=>byId.get(id)).filter(Boolean);
+}
+function queueWords(){
+ const today=todayWords(),byId=new Map(today.map(w=>[w.id,w]));
+ const held=new Set(session.pending.map(p=>p.id));
+ const repeats=session.pending.filter(p=>p.readyAt<=session.count&&byId.has(p.id)&&!byId.get(p.id).mastered).sort((a,b)=>a.readyAt-b.readyAt).map(p=>byId.get(p.id));
+ return [...repeats,...today.filter(w=>eligible(w)&&!held.has(w.id)).sort((a,b)=>a.due-b.due||a.created-b.created)];
+}
+function groupName(w){return String(w.unit||w.group||w.category||w.tags.join(' · ')||'未分组');}
+function groupRows(items,target,actions=false){
+ target.replaceChildren();if(!items.length){target.append(element('div','empty','暂无词条'));return;}
+ const groups=new Map();for(const w of items){const name=groupName(w);if(!groups.has(name))groups.set(name,[]);groups.get(name).push(w);}
+ for(const [name,entries] of groups){const box=element('section','group-box'),heading=element('div','group-heading');heading.append(element('h3','',name),element('span','group-count',entries.length+' 词'));box.append(heading);
+  for(const w of entries){const row=element('div','group-row'),en=element('div','english');en.append(element('span','',w.word));
+   if(actions){const controls=element('span','row-actions');if(w.mastered){const retry=element('button','','↻');retry.type='button';retry.title='重新加入复习';retry.setAttribute('aria-label','重新复习 '+w.word);retry.onclick=()=>{w.mastered=false;w.scheduleVersion=2;w.stage=0;w.due=Date.now();delete w.reinforcement;session.pending=session.pending.filter(p=>p.id!==w.id);save();persist(SESSION_KEY,session);render();};controls.append(element('span','mastered','熟记'),retry);}
+    const del=element('button','','×');del.type='button';del.setAttribute('aria-label','删除 '+w.word);del.onclick=()=>{if(confirm('删除 '+w.word+'？')){words=words.filter(item=>item.id!==w.id);session.pending=session.pending.filter(p=>p.id!==w.id);save();persist(SESSION_KEY,session);render();}};controls.append(del);en.append(controls);}
+   row.append(element('div','',w.definition),en);box.append(row);
+  }target.append(box);
+ }
+}
+function renderCard(){
+ const queue=queueWords(),preview=direction==='en-zh';
+ $('en-zh').setAttribute('aria-pressed',String(preview));$('zh-en').setAttribute('aria-pressed',String(!preview));$('today-preview').hidden=!preview;$('card').hidden=preview;
+ let w=queue.find(w=>w.id===currentId);if(!w){w=queue[0];currentId=w?.id||null;flipped=false;}
+ $('review-count').textContent=`${todayWords().length} / ${DAILY_LIMIT}`;
+ const held=session.pending.filter(p=>words.some(w=>w.id===p.id));
+ const waiting=held.filter(p=>p.readyAt>session.count);
+ $('queue-status').textContent=queue.length?`待复习 ${queue.length} · 待重现 ${held.length}`:waiting.length?`待重现 ${waiting.length} · 还需 ${Math.min(...waiting.map(p=>p.readyAt-session.count))} 个其他词`:'本轮完成';
+ $('undo-review').hidden=preview||!reviewHistory.length;
+ document.querySelectorAll('[data-grade]').forEach(b=>b.disabled=preview||!w||!flipped);
+ if(preview){groupRows(todayWords(),$('today-list'));return;}
+ const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
+ if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':'本轮完成'));return;}
+ content.append(element('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition));
+ if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach(t=>ex.append(element('div','',t)));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
+ $('card').setAttribute('aria-label',flipped?'英文答案，点击返回中文':'中文题面，点击查看英文');
+}
+function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const filtered=words.filter(w=>[w.word,w.definition,groupName(w)].join(' ').toLocaleLowerCase().includes(query));$('shown').textContent=filtered.length+' 词';groupRows(filtered,$('list'),true);}
+function render(){todayWords();$('total').textContent=words.length;$('due-count').textContent=queueWords().length;$('learned').textContent=words.filter(w=>w.mastered).length;renderCard();renderList();}
+function setDirection(value){direction=value;flipped=false;try{localStorage.setItem('wordwell.direction',value);}catch(e){}renderCard();}
+$('en-zh').onclick=()=>setDirection('en-zh');$('zh-en').onclick=()=>setDirection('zh-en');
+$('card').onclick=()=>{if(!currentId||direction!=='zh-en')return;flipped=!flipped;renderCard();};
+function normalizeSchedule(w){if(w.scheduleVersion===2)return;w.stage=[0,1,2,4,4,6,8,9][Math.min(7,w.stage)];w.scheduleVersion=2;}
+function advanceNormal(w){if(w.stage>=INTERVALS.length){w.mastered=true;w.due=0;return;}w.due=calendarDays(Date.now(),INTERVALS[w.stage]);w.stage++;}
+function gradeWord(grade){
+ ensureDay();const queue=queueWords(),w=queue.find(item=>item.id===currentId);if(!w||!flipped||direction!=='zh-en')return;
+ const before=clone(w),previousSession=clone(session),repeat=session.pending.some(p=>p.id===w.id);
+ normalizeSchedule(w);w.mastered=false;session.count++;session.pending=session.pending.filter(p=>p.id!==w.id);
+ if(grade==='again'){
+  w.reinforcement={anchor:midnight(),step:0};w.due=calendarDays(w.reinforcement.anchor,1);
+  session.pending.push({id:w.id,readyAt:session.count+10});
+ }else if(!repeat){
+  if(w.reinforcement){
+   if(w.reinforcement.step<2){w.reinforcement.step++;w.due=calendarDays(w.reinforcement.anchor,[1,3,5][w.reinforcement.step]);}
+   else{delete w.reinforcement;advanceNormal(w);}
+  }else advanceNormal(w);
+ }
+ reviewHistory.push({before,after:JSON.stringify(w),session:previousSession});save();persist(SESSION_KEY,session);currentId=null;flipped=false;render();
+}
+document.querySelectorAll('[data-grade]').forEach(b=>b.onclick=()=>gradeWord(b.dataset.grade));
+$('undo-review').onclick=()=>{
+ ensureDay();const prev=reviewHistory.pop();if(!prev)return;const i=words.findIndex(w=>w.id===prev.before.id);
+ if(i<0||JSON.stringify(words[i])!==prev.after){render();toast('词条已变更，未覆盖');return;}
+ words[i]=prev.before;session=prev.session;save();persist(SESSION_KEY,session);currentId=prev.before.id;flipped=true;render();
+};
+$('search').oninput=renderList;
+$('single-import').onclick=()=>$('single-dialog').showModal();$('single-close').onclick=()=>$('single-dialog').close();
+function newWord(word,definition,tags=[]){const now=Date.now();return {id:crypto.randomUUID?crypto.randomUUID():now+'-'+Math.random().toString(36).slice(2),word,definition,tags,stage:0,due:now,created:now,scheduleVersion:2};}
+function parseBatch(text){
+ let parsed;try{parsed=JSON.parse(text);}catch(e){if(/^[\s]*[\[{]/.test(text))throw Error('JSON 格式错误');}
+ if(parsed!==undefined){if(Array.isArray(parsed)&&parsed.every(w=>typeof w.word==='string'&&typeof w.definition==='string'&&!w.id)){return {version:1,words:parsed.map(w=>({...newWord(w.word,w.definition,w.tags||[]),...w}))};}return parsed;}
+ const lines=text.trim().split(/\r?\n/).filter(line=>line.trim());if(!lines.length)throw Error('内容为空');
+ const tags=$('bulk-unit').value.trim()?[$('bulk-unit').value.trim()]:[];
+ const entries=lines.map((line,i)=>{let parts=line.split('\t');if(parts.length<2)parts=line.split(/\s*[|｜]\s*|\s{2,}/);if(parts.length<2)parts=line.split(',');if(parts.length<2)throw Error('第 '+(i+1)+' 行缺少中英文列');let [first,...rest]=parts;let second=rest.join(' ').trim();first=first.trim();return /[\u3400-\u9fff]/.test(first)&&!/[\u3400-\u9fff]/.test(second)?newWord(second,first,[...tags]):newWord(first,second,[...tags]);});return {version:1,words:entries};
+}
+function download(data,type,name){const url=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
 let lookupSource=false,lookupController=null,lookupSequence=0;
 const lookupCache=new Map();
 function dictionaryCredit(word){
@@ -107,13 +128,13 @@ function dictionaryCredit(word){
 function clearLookup(){
   lookupSequence++;lookupController?.abort();lookupSource=false;
   $('lookup-status').textContent='';$('lookup-preview').replaceChildren();$('example-credit').hidden=true;
-  $('lookup').disabled=false;$('lookup').textContent='⌕ 查中文释义和例句';$('add-form').querySelector('[type="submit"]').disabled=false;
+  $('lookup').disabled=false;$('lookup').textContent='查释义与例句';$('add-form').querySelector('[type="submit"]').disabled=false;
 }
 $('word').addEventListener('input',clearLookup);
 async function lookupJSON(url,signal){const r=await fetch(url,{signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!r.ok)throw Error('服务暂不可用');return r.json();}
 $('lookup').onclick=async()=>{
-  const word=$('word').value.trim();if(!word){$('lookup-status').textContent='请先输入英文单词，例如 apple。';$('word').focus();return;}
-  if(!/[a-z]/i.test(word)){ $('lookup-status').textContent='请输入英文单词或短语。';return;}
+  const word=$('word').value.trim();if(!word){$('lookup-status').textContent='请输入英文';$('word').focus();return;}
+  if(!/[a-z]/i.test(word)){ $('lookup-status').textContent='请输入英文';return;}
   const token=++lookupSequence;lookupController?.abort();const controller=new AbortController();lookupController=controller;
   const originalDefinition=$('definition').value,originalExamples=$('examples').value;
   $('lookup').disabled=true;$('lookup').textContent='正在查询…';$('add-form').querySelector('[type="submit"]').disabled=true;
@@ -140,31 +161,18 @@ $('lookup').onclick=async()=>{
     const preview=$('lookup-preview');
     if(result.meanings.length){preview.append(element('strong','','词典英文释义（帮助区分语境）'));const list=element('ol');result.meanings.forEach(t=>list.append(element('li','',t)));preview.append(list,dictionaryCredit(word));}
     $('example-credit').hidden=!lookupSource;
-    const notes=[];notes.push(result.chinese?'中文释义已查到，请结合电视中的语境检查。':'中文翻译暂不可用或达到免费服务额度，请稍后重试，或手动填写。');
-    notes.push(result.examples.length?'已查到词典例句，可修改后保存。':'词典未提供例句或查询不可用；可以自行填写例句。');
-    notes.push('没有自动保存：确认内容后点击“添加到单词本”。');$('lookup-status').textContent=notes.join('\n');
-  }catch(e){if(token===lookupSequence)$('lookup-status').textContent='查询未完成，请检查网络后重试。你填写的内容未改动，也可手动添加。';}
+    const notes=[];notes.push(result.chinese?'中文已填入':'翻译暂不可用');
+    notes.push(result.examples.length?'例句已填入':'暂无例句');
+    $('lookup-status').textContent=notes.join('\n');
+  }catch(e){if(token===lookupSequence)$('lookup-status').textContent='查询失败';}
   finally{clearTimeout(timeout);if(token===lookupSequence){$('lookup').disabled=false;$('lookup').textContent='⌕ 重新查询';$('add-form').querySelector('[type="submit"]').disabled=false;}}
 };
 
-$('add-form').addEventListener('submit',e=>{e.preventDefault();const word=$('word').value.trim(),definition=$('definition').value.trim();if(!word||!definition){toast('Please enter both a word and its meaning.');return;}if(words.some(w=>w.word.toLocaleLowerCase()===word.toLocaleLowerCase())){toast('That word is already in your collection.');return;}const now=Date.now();words.push({id:crypto.randomUUID?crypto.randomUUID():`${now}-${Math.random().toString(36).slice(2)}`,word,definition,tags:[...new Set($('tags').value.split(',').map(t=>t.trim()).filter(Boolean))].slice(0,20),examples:$('examples').value.split('\n').map(t=>t.trim()).filter(Boolean).slice(0,10),dictionarySource:lookupSource,stage:0,due:now,created:now});const saved=save();e.target.reset();clearLookup();render();$('word').focus();toast(saved?'A new word, safely kept.':'Added for this session. Export a backup.');});
-$('card').onclick=()=>{if(direction!=='zh-en'||!currentId)return;flipped=!flipped;renderCard();};
-document.querySelectorAll('[data-grade]').forEach(button=>button.onclick=()=>{const w=words.find(w=>w.id===currentId);if(direction!=='zh-en'||!w||!flipped)return;if(!dueWords().some(item=>item.id===w.id)){render();return;}const previous={id:w.id,stage:w.stage,due:w.due};const grade=button.dataset.grade;if(grade==='again'){w.stage=0;w.due=Date.now()+10*60000;}else if(grade==='hard'){w.stage=Math.max(0,w.stage-1);w.due=Date.now()+INTERVALS[w.stage]*DAY;}else{w.due=Date.now()+INTERVALS[Math.min(w.stage,INTERVALS.length-1)]*DAY;w.stage=Math.min(INTERVALS.length,w.stage+1);}reviewHistory.push({...previous,afterStage:w.stage,afterDue:w.due});const saved=save();currentId=null;flipped=false;render();toast(saved?'Practice saved. A little stronger.':'Review updated for this session. Export a backup.');});
-$('undo-review').onclick=()=>{
-  const previous=reviewHistory.pop();if(!previous)return;
-  const w=words.find(w=>w.id===previous.id);
-  if(!w||w.stage!==previous.afterStage||w.due!==previous.afterDue){render();toast('该单词已被删除或在其他窗口修改，未覆盖其最新进度。');return;}
-  w.stage=previous.stage;w.due=previous.due;
-  const saved=save();currentId=w.id;flipped=true;render();$('card').focus();
-  toast(saved?'已撤销上次评分，请重新选择。':'已在本次会话撤销，请导出备份以免丢失。');
-};
-$('search').oninput=renderList;
-function download(data,type,name){const url=URL.createObjectURL(new Blob([data],{type}));const a=document.createElement('a');a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);}
 function backupStatus(message){$('backup-status').textContent=message;}
 function openBackup(mode){
   const exporting=mode==='export';
-  $('backup-title').textContent=exporting?'导出单词备份':'导入单词备份';
-  $('backup-help').textContent=exporting?'点击下载保存 JSON 文件，或复制下方全部文本。部分内嵌预览会限制下载，文本备份仍可使用。':'选择备份文件或粘贴 JSON 文本，然后点击“确认导入”。同名单词会保留现有内容。';
+  $('backup-title').textContent=exporting?'导出':'批量导入';
+  $('bulk-unit-area').hidden=exporting;
   $('backup-file-area').hidden=exporting;
   $('backup-download').hidden=!exporting;
   $('backup-copy').hidden=!exporting;
@@ -172,7 +180,7 @@ function openBackup(mode){
   $('backup-text').readOnly=exporting;
   $('backup-text').value=exporting?JSON.stringify({version:1,words},null,2):'';
   $('backup-file').value='';
-  backupStatus(exporting?`已生成 ${words.length} 个单词的备份。`:'尚未导入任何内容。');
+  backupStatus(exporting?`已生成 ${words.length} 个单词的备份。`:'');
   if(backupURL){URL.revokeObjectURL(backupURL);backupURL=null;}
   if(exporting){backupURL=URL.createObjectURL(new Blob([$('backup-text').value],{type:'application/json'}));$('backup-download').href=backupURL;}
   $('backup-dialog').showModal();
@@ -181,37 +189,30 @@ $('export').onclick=()=>openBackup('export');
 $('import').onclick=()=>openBackup('import');
 $('backup-close').onclick=()=>$('backup-dialog').close();
 $('backup-dialog').addEventListener('close',()=>{if(backupURL){URL.revokeObjectURL(backupURL);backupURL=null;}});
-$('backup-download').onclick=()=>backupStatus('已请求下载，请检查浏览器下载列表。如果没有文件，请复制下方全部文本保存。');
+$('backup-download').onclick=()=>backupStatus('已请求下载');
 $('backup-copy').onclick=async()=>{
-  try{await navigator.clipboard.writeText($('backup-text').value);backupStatus('备份文本已复制。请粘贴到文件或备忘录保存。');}
-  catch(e){$('backup-text').focus();$('backup-text').select();$('backup-text').setSelectionRange(0,$('backup-text').value.length);backupStatus('自动复制不可用，已选中全部内容。请长按复制或按 Ctrl/Cmd+C。');}
+  try{await navigator.clipboard.writeText($('backup-text').value);backupStatus('已复制');}
+  catch(e){$('backup-text').focus();$('backup-text').select();$('backup-text').setSelectionRange(0,$('backup-text').value.length);backupStatus('已全选，请手动复制');}
 };
 $('backup-file').onchange=async e=>{
   const file=e.target.files[0];if(!file)return;
-  try{if(file.size>5*1024*1024)throw Error('备份文件超过 5 MB。');$('backup-text').value=await file.text();backupStatus('文件已读取，请点击“确认导入”。');}
+  try{if(file.size>5*1024*1024)throw Error('备份文件超过 5 MB。');$('backup-text').value=await file.text();backupStatus('文件已读取');}
   catch(error){backupStatus(error.message);}
 };
 $('backup-merge').onclick=()=>{
   try{
     const text=$('backup-text').value;if(new Blob([text]).size>5*1024*1024)throw Error('备份内容超过 5 MB。');
-    let data;try{data=JSON.parse(text);}catch(e){throw Error('JSON 格式不正确，请选择有效备份文件或粘贴完整内容。');}
+    const data=parseBatch(text);
     if(!data||data.version!==1||!Array.isArray(data.words)||!data.words.every(valid)||new Set(data.words.map(w=>w.id)).size!==data.words.length)throw Error('这不是有效的 Wordwell 备份，原有单词未改动。');
     const names=new Set(words.map(w=>w.word.toLocaleLowerCase())),ids=new Set(words.map(w=>w.id));let count=0;
     for(const source of data.words){const w={...source,tags:[...source.tags]};if(names.has(w.word.toLocaleLowerCase()))continue;if(ids.has(w.id))w.id=`${Date.now()}-${Math.random().toString(36).slice(2)}`;words.push(w);names.add(w.word.toLocaleLowerCase());ids.add(w.id);count++;}
     const saved=save();render();backupStatus(`已导入 ${count} 个单词，跳过 ${data.words.length-count} 个同名单词。`+(saved?'已保存到此设备。':'当前仅保留在本次会话，请立即导出备份。'));toast(`已导入 ${count} 个单词。`);
   }catch(error){backupStatus(error.message);}
 };
-const icon='<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#244c3c"/><text x="256" y="345" text-anchor="middle" font-family="Georgia,serif" font-size="350" fill="#deedb4">w</text></svg>';
-const manifest={name:'Wordwell — Personal Wordbook',short_name:'Wordwell',start_url:location.href.split('#')[0],display:'standalone',background_color:'#f6f5ef',theme_color:'#244c3c',icons:[{src:'data:image/svg+xml,'+encodeURIComponent(icon),sizes:'any',type:'image/svg+xml',purpose:'any'}]};
-const manifestURL=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}));const link=document.createElement('link');link.rel='manifest';link.href=manifestURL;document.head.append(link);
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;});
-$('install').onclick=async()=>{if(installPrompt){await installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;}else $('install-dialog').showModal();};
-$('close-dialog').onclick=()=>$('install-dialog').close();
-$('download').onclick=()=>{const clone=document.documentElement.cloneNode(true);clone.querySelector('link[rel="manifest"]')?.remove();clone.querySelector('#offline-seed').textContent=JSON.stringify(words).replace(/</g,'\\u003c');clone.querySelector('#install-dialog').removeAttribute('open');clone.querySelector('#backup-dialog').removeAttribute('open');clone.querySelector('#backup-text').value='';clone.querySelector('#backup-text').textContent='';clone.querySelector('#backup-download').removeAttribute('href');clone.querySelector('#toast').textContent='';download('<!doctype html>\n'+clone.outerHTML,'text/html','wordwell-offline.html');toast('Offline copy downloaded with your current words.');};
-window.addEventListener('storage',e=>{if(e.key===KEY||e.key===PLAN_KEY||e.key===null){dailyPlan=null;read();render();}});
-window.addEventListener('pageshow',()=>render());document.addEventListener('visibilitychange',()=>{if(!document.hidden)render();});setInterval(render,60000);
-$('today').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+
+$('add-form').addEventListener('submit',e=>{e.preventDefault();const word=$('word').value.trim(),definition=$('definition').value.trim();if(!word||!definition)return;if(words.some(w=>w.word.toLocaleLowerCase()===word.toLocaleLowerCase())){toast('单词已存在');return;}const w=newWord(word,definition,[...new Set($('tags').value.split(',').map(t=>t.trim()).filter(Boolean))].slice(0,20));w.examples=$('examples').value.split('\n').map(t=>t.trim()).filter(Boolean).slice(0,10);w.dictionarySource=lookupSource;words.push(w);save();e.target.reset();clearLookup();render();$('single-dialog').close();});
+window.addEventListener('storage',e=>{if([KEY,PLAN_KEY,SESSION_KEY,null].includes(e.key)){dailyPlan=null;session=null;read();render();}});
+function refresh(){read();render();}
+window.addEventListener('pageshow',refresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});setInterval(render,60000);
 read();render();
-</script>
-</body>
-</html>
+</script></body></html>
