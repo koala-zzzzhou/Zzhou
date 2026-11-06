@@ -63,6 +63,19 @@ function ensureDay(){
  const completedIds=[...new Set([...storedIds,...words.filter(w=>w.lastReviewedDay===day).map(w=>w.id)])];
  if(JSON.stringify(session.completedIds)!==JSON.stringify(completedIds)){session.completedIds=completedIds;persist(SESSION_KEY,session);}
 }
+
+function validStudyDay(value){
+ if(typeof value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
+ const [year,month,date]=value.split('-').map(Number),d=new Date(year,month-1,date);return d.getFullYear()===year&&d.getMonth()===month-1&&d.getDate()===date;
+}
+function firstStudyDay(w){
+ const today=localDay();if(validStudyDay(w.firstStudiedDay)&&w.firstStudiedDay<=today)return w.firstStudiedDay;
+ const dates=[];if(validStudyDay(w.lastReviewedDay))dates.push(w.lastReviewedDay);
+ for(const time of [w.lastReviewedAt,w.reinforcement?.anchor])if(Number.isFinite(time)&&time>0)dates.push(localDay(time));
+ return dates.filter(day=>day<=today).sort()[0]||null;
+}
+function isCrossDay(w){const first=firstStudyDay(w);return first!==null&&first<localDay();}
+
 function studied(w){return Boolean(w.lastReviewedAt||w.reviewCount>0||w.stage>0||w.reinforcement||w.mastered||session?.pending.some(p=>p.id===w.id));}
 function todayWords(){
  ensureDay();const byId=new Map(words.map(w=>[w.id,w]));
@@ -71,7 +84,7 @@ function todayWords(){
  const consumedIds=new Set(consumed.map(w=>w.id));
  const retained=existing.filter(w=>!consumedIds.has(w.id)).slice(0,Math.max(0,dailyLimit-consumed.length));
  const active=[...consumed,...retained],ids=new Set(active.map(w=>w.id));
- const additions=words.filter(w=>eligible(w)&&!ids.has(w.id)).sort((a,b)=>Number(studied(b))-Number(studied(a))||a.due-b.due||a.created-b.created||a.id.localeCompare(b.id)).slice(0,Math.max(0,dailyLimit-active.length));
+ const additions=words.filter(w=>eligible(w)&&!ids.has(w.id)).sort((a,b)=>Number(isCrossDay(b))-Number(isCrossDay(a))||a.due-b.due||a.created-b.created||a.id.localeCompare(b.id)).slice(0,Math.max(0,dailyLimit-active.length));
  const admitted=new Set(dailyPlan.ids);for(const w of additions)if(!admitted.has(w.id)){dailyPlan.ids.push(w.id);admitted.add(w.id);}
  if(additions.length)persist(PLAN_KEY,dailyPlan);
  const selectedIds=new Set([...active,...additions].map(w=>w.id));
@@ -97,12 +110,13 @@ function groupRows(items,target,actions=false){
  }
 }
 function retryModule(p){
- if(['zh-en','review'].includes(p.module))return p.module;
- const w=words.find(item=>item.id===p.id);return w&&w.stage>0?'review':'zh-en';
+ const w=words.find(item=>item.id===p.id);
+ if(!w||!isCrossDay(w))return 'zh-en';
+ return ['zh-en','review'].includes(p.module)?p.module:'review';
 }
 function visibleQueue(){
  const queue=queueWords(),pending=new Map(session.pending.map(p=>[p.id,p]));
- return queue.filter(w=>{const retry=pending.get(w.id);if(retry)return !['zh-en','review'].includes(direction)||retryModule(retry)===direction;return direction==='zh-en'?!studied(w):direction==='review'?studied(w):true;});
+ return queue.filter(w=>{const retry=pending.get(w.id);if(retry)return !['zh-en','review'].includes(direction)||retryModule(retry)===direction;return direction==='zh-en'?!isCrossDay(w):direction==='review'?isCrossDay(w):true;});
 }
 function renderCard(){
  const queue=visibleQueue(),preview=direction==='en-zh',library=direction==='library',speaking=direction==='speaking',cardMode=!preview&&!library&&!speaking;
@@ -118,7 +132,7 @@ function renderCard(){
  document.querySelector('[data-grade=good]').textContent=flipped?'下一词':'记得';document.querySelector('[data-grade=again]').textContent=flipped?'记错了':'不记得';
  if(preview){groupRows(todayWords(),$('today-list'));return;}if(speaking){renderSpeaking();return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
- if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':'本轮完成'));return;}
+ if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':direction==='review'?'暂无到期复习':'本轮完成'));return;}
  content.append(markedText('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition,markKey('word',w.id,flipped?'word':'definition')));
  if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach((t,i)=>ex.append(markedText('div','',t,markKey('word',w.id,'example:'+i))));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
  $('card').setAttribute('aria-label',flipped?'英文答案':'中文题面');
@@ -133,7 +147,7 @@ function advanceNormal(w){if(w.stage>=INTERVALS.length){w.mastered=true;w.due=0;
 function gradeWord(grade){
  ensureDay();const queue=queueWords(),w=queue.find(item=>item.id===currentId);if(!w||!flipped||!['zh-en','review'].includes(direction))return;
  const before=clone(w),previousSession=clone(session),repeat=session.pending.some(p=>p.id===w.id);
- normalizeSchedule(w);w.lastReviewedAt=Date.now();w.lastReviewedDay=localDay();w.reviewCount=(Number(w.reviewCount)||0)+1;w.mastered=false;session.count++;if(!session.completedIds.includes(w.id))session.completedIds.push(w.id);session.pending=session.pending.filter(p=>p.id!==w.id);
+ if(!validStudyDay(w.firstStudiedDay)||w.firstStudiedDay>localDay())w.firstStudiedDay=firstStudyDay(w)||localDay();normalizeSchedule(w);w.lastReviewedAt=Date.now();w.lastReviewedDay=localDay();w.reviewCount=(Number(w.reviewCount)||0)+1;w.mastered=false;session.count++;if(!session.completedIds.includes(w.id))session.completedIds.push(w.id);session.pending=session.pending.filter(p=>p.id!==w.id);
  if(grade==='again'){
   w.reinforcement={anchor:midnight(),step:0};w.due=calendarDays(w.reinforcement.anchor,1);
   session.pending.push({id:w.id,readyAt:session.count+10,module:direction});
