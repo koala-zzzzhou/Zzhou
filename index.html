@@ -13,15 +13,19 @@
 .card{cursor:default;border-radius:9px}#ratings button[data-grade="good"]{background:var(--lime);border-color:var(--lime)}#ratings button[data-grade="again"]{background:#fffefa;border-color:var(--line)}
 
 #undo-review.undo-done{background:var(--green);border-color:var(--green);color:white;opacity:1;font-size:15px}#toast.undo-toast{top:50%;bottom:auto;transform:translate(-50%,-50%);font-size:18px;padding:16px 26px;box-shadow:0 8px 35px #18302533;pointer-events:none}
+
+#speaking-view{margin-top:16px}.speaking-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}.speaking-toolbar input{flex:1;min-width:0}.speaking-toolbar button{white-space:nowrap;font-size:12px}.speaking-entry{background:#fffefa;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:16px}.speaking-topic-line{display:flex;justify-content:space-between;gap:12px;padding:12px 20px;background:#e9eddf;align-items:center}.speaking-topic-title{font-size:13px;font-weight:600;overflow-wrap:anywhere}.speaking-topic-line button{border:0;background:transparent;padding:3px 8px;color:var(--muted)}.speaking-body{padding:18px 20px 22px}.speaking-question{font-size:18px;line-height:1.6;font-weight:600;margin:0 0 14px;white-space:pre-wrap;overflow-wrap:anywhere}.speaking-answer{font-size:15px;line-height:1.85;margin:0;white-space:pre-wrap;overflow-wrap:anywhere}.speaking-import-modes{display:flex;gap:8px;margin-top:18px}.speaking-import-modes button{font-size:12px}.speaking-submit{margin-top:16px}#speaking-answer,#speaking-text{min-height:180px}#speaking-status{font-size:12px;white-space:pre-wrap}
+@media(max-width:640px){.direction-switch{grid-template-columns:repeat(5,minmax(0,1fr))}.direction-switch button{font-size:11px;line-height:1.5;min-height:44px;overflow-wrap:anywhere}.speaking-toolbar{flex-wrap:wrap}.speaking-toolbar input{flex-basis:100%}.speaking-topic-line{padding:10px 14px}.speaking-body{padding:14px}.speaking-question{font-size:16px}.speaking-answer{font-size:14px}}
 </style></head><body>
 <header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
 <main><div id="storage-warning" class="notice" role="alert" hidden></div>
-<div class="layout"><section><div class="section-head"><h2 id="module-title">今日预览</h2><div class="plan-tools"><label id="limit-control" for="daily-limit">今日数量 <select id="daily-limit"><option value="100">100</option><option value="120">120</option><option value="140">140</option></select></label><span id="review-count" class="pill"></span></div></div><nav class="direction-switch" aria-label="单词模块"><button id="en-zh" aria-pressed="true">今日预览</button><button id="zh-en" aria-pressed="false">学习</button><button id="tab-review" aria-pressed="false">复习</button><button id="tab-library" aria-pressed="false">词库</button></nav><section id="today-preview"><div id="today-list" class="group-grid"></div></section><div id="card" class="card" role="group" aria-live="polite" aria-label="中文题面" hidden><span id="card-content" class="card-content"></span></div></section>
+<div class="layout"><section><div class="section-head"><h2 id="module-title">今日预览</h2><div class="plan-tools"><label id="limit-control" for="daily-limit">今日数量 <select id="daily-limit"><option value="100">100</option><option value="120">120</option><option value="140">140</option></select></label><span id="review-count" class="pill"></span></div></div><nav class="direction-switch" aria-label="单词模块"><button id="en-zh" aria-pressed="true">今日预览</button><button id="zh-en" aria-pressed="false">学习</button><button id="tab-review" aria-pressed="false">复习</button><button id="tab-library" aria-pressed="false">词库</button><button id="tab-speaking" aria-pressed="false">Part 1 口语库</button></nav><section id="today-preview"><div id="today-list" class="group-grid"></div></section><div id="card" class="card" role="group" aria-live="polite" aria-label="中文题面" hidden><span id="card-content" class="card-content"></span></div></section>
 <aside id="score-panel" class="score-panel"><div id="ratings" class="ratings"><button data-grade="good" disabled>记得</button><button data-grade="again" disabled>不记得</button></div><div id="queue-status" role="status"></div><button id="undo-review" type="button" aria-label="撤销上次评分" title="撤销上次评分" disabled>↶</button></aside></div>
-<section class="library" id="library-view" hidden><div class="section-head"><h2>词库</h2><span id="shown" class="pill"></span></div><div class="tools"><input id="search" type="search" aria-label="搜索词库" placeholder="搜索"></div><div id="list" class="group-grid"></div></section></main>
+<section class="library" id="library-view" hidden><div class="section-head"><span id="shown" class="pill"></span></div><div class="tools"><input id="search" type="search" aria-label="搜索词库" placeholder="搜索"></div><div id="list" class="group-grid"></div></section><section id="speaking-view" hidden><div class="speaking-toolbar"><input id="speaking-search" type="search" aria-label="搜索口语库" placeholder="搜索题型、问题或答案"><button id="speaking-import" class="solid" type="button">导入口语</button><button id="speaking-export" type="button">导出口语</button></div><div id="speaking-list"></div></section></main>
 <nav class="floating-actions" aria-label="词库操作"><button id="single-import">单个导入</button><button id="import">批量导入</button><button id="export">导出</button></nav>
 <dialog id="single-dialog" aria-labelledby="single-title"><div class="dialog-header"><h2 id="single-title">单个导入</h2><button id="single-close" type="button" aria-label="关闭">×</button></div><form class="side" id="add-form"><label for="word">英文</label><input id="word" required maxlength="120" autocomplete="off"><button id="lookup" class="lookup-button" type="button">查释义与例句</button><p id="lookup-status" role="status"></p><div id="lookup-preview" class="lookup-preview"></div><label for="definition">中文</label><textarea id="definition" required maxlength="2000"></textarea><label for="examples">例句</label><textarea id="examples" maxlength="4000"></textarea><div id="example-credit" hidden></div><label for="tags">单元 / 分类</label><input id="tags" maxlength="200"><button class="solid" type="submit">保存</button></form></dialog>
 <dialog id="backup-dialog" aria-labelledby="backup-title"><div class="dialog-header"><h2 id="backup-title">批量导入</h2><button id="backup-close" type="button" aria-label="关闭">×</button></div><div id="bulk-unit-area"><label for="bulk-unit">单元 / 分类</label><input id="bulk-unit" maxlength="200"></div><div id="backup-file-area"><label for="backup-file">文件</label><input id="backup-file" type="file" accept=".json,.txt,.tsv,.csv,application/json,text/plain"></div><label for="backup-text">内容</label><textarea id="backup-text" spellcheck="false" placeholder="英文&#9;中文"></textarea><p id="backup-status" role="status" aria-live="polite"></p><div class="backup-actions"><a id="backup-download" download="wordwell-backup.json">下载 JSON</a><button id="backup-copy">复制</button><button id="backup-merge" class="solid">导入</button></div></dialog>
+<dialog id="speaking-dialog" aria-labelledby="speaking-dialog-title"><div class="dialog-header"><h2 id="speaking-dialog-title">导入 Part 1 口语</h2><button id="speaking-close" type="button" aria-label="关闭口语导入">×</button></div><div class="speaking-import-modes" role="group" aria-label="口语导入方式"><button id="speaking-manual-tab" type="button" aria-pressed="true">填写导入</button><button id="speaking-text-tab" type="button" aria-pressed="false">文本 / 文件导入</button></div><form id="speaking-form"><label for="speaking-topic">题型</label><input id="speaking-topic" required maxlength="120"><label for="speaking-question">问题</label><textarea id="speaking-question" required maxlength="2000"></textarea><label for="speaking-answer">答案</label><textarea id="speaking-answer" required maxlength="20000"></textarea><button type="submit" class="solid speaking-submit">保存口语</button></form><div id="speaking-batch" hidden><label for="speaking-file">口语文件</label><input id="speaking-file" type="file" accept=".json,.txt,.md,text/plain,application/json"><label for="speaking-text">口语文本 / JSON</label><textarea id="speaking-text" placeholder="题型：opportunity&#10;## Did you have any opportunities to take part in new activities as a child?&#10;回答：Your answer..."></textarea><button id="speaking-batch-save" class="solid speaking-submit" type="button">导入口语</button></div><p id="speaking-status" role="status" aria-live="polite"></p></dialog>
 <div id="toast" role="status" aria-live="polite"></div><script id="offline-seed" type="application/json">[]</script><script>
 
 'use strict';
@@ -32,7 +36,7 @@ let pendingGrade=null,undoFeedbackTimer;
 const reviewHistory=[];let dailyLimit=100;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit))dailyLimit=limit;}catch(e){}
 $('daily-limit').value=String(dailyLimit);
 $('daily-limit').onchange=()=>{const value=Number($('daily-limit').value);if(![100,120,140].includes(value))return;dailyLimit=value;persist('wordwell.daily-limit',dailyLimit);currentId=null;flipped=false;pendingGrade=null;render();};
-try{const saved=localStorage.getItem('wordwell.module');if(['en-zh','zh-en','review','library'].includes(saved))direction=saved;}catch(e){}
+try{const saved=localStorage.getItem('wordwell.module');if(['en-zh','zh-en','review','library','speaking'].includes(saved))direction=saved;}catch(e){}
 function localDay(time=Date.now()){const d=new Date(time);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function midnight(time=Date.now()){const d=new Date(time);d.setHours(0,0,0,0);return d.getTime();}
 function calendarDays(time,days){const d=new Date(time);d.setDate(d.getDate()+days);d.setHours(0,0,0,0);return d.getTime();}
@@ -87,19 +91,19 @@ function groupRows(items,target,actions=false){
 }
 function visibleQueue(){return queueWords().filter(w=>direction==='zh-en'?!studied(w):direction==='review'?studied(w):true);}
 function renderCard(){
- const queue=visibleQueue(),preview=direction==='en-zh',library=direction==='library',cardMode=!preview&&!library;
- for(const [id,value] of [['en-zh','en-zh'],['zh-en','zh-en'],['tab-review','review'],['tab-library','library']])$(id).setAttribute('aria-pressed',String(direction===value));
- $('module-title').textContent={'en-zh':'今日预览','zh-en':'学习','review':'复习','library':'词库'}[direction];
- $('limit-control').hidden=!preview;$('library-view').hidden=!library;$('today-preview').hidden=!preview;$('card').hidden=!cardMode;$('score-panel').hidden=!cardMode;
+ const queue=visibleQueue(),preview=direction==='en-zh',library=direction==='library',speaking=direction==='speaking',cardMode=!preview&&!library&&!speaking;
+ for(const [id,value] of [['en-zh','en-zh'],['zh-en','zh-en'],['tab-review','review'],['tab-library','library'],['tab-speaking','speaking']])$(id).setAttribute('aria-pressed',String(direction===value));
+ $('module-title').textContent={'en-zh':'今日预览','zh-en':'学习','review':'复习','library':'词库','speaking':'Part 1 口语库'}[direction];
+ document.querySelector('.floating-actions').hidden=speaking;$('speaking-view').hidden=!speaking;$('limit-control').hidden=!preview;$('library-view').hidden=!library;$('today-preview').hidden=!preview;$('card').hidden=!cardMode;$('score-panel').hidden=!cardMode;
  const layout=document.querySelector('.layout');layout.classList.toggle('is-preview',preview);layout.classList.toggle('is-list',!cardMode);
  let w=queue.find(w=>w.id===currentId);if(!w){w=queue[0];currentId=w?.id||null;flipped=false;pendingGrade=null;}
- $('review-count').textContent=library?words.length+' 词':`${todayWords().length} / ${dailyLimit}`;
+ $('review-count').textContent=speaking?speakingItems.length+' 题':library?words.length+' 词':`${todayWords().length} / ${dailyLimit}`;
  const held=session.pending.filter(p=>words.some(w=>w.id===p.id)),waiting=held.filter(p=>p.readyAt>session.count);
  $('queue-status').textContent=queue.length?`待${direction==='zh-en'?'学习':'复习'} ${queue.length} · 待重现 ${held.length}`:direction==='review'&&waiting.length?`待重现 ${waiting.length} · 还需 ${Math.min(...waiting.map(p=>p.readyAt-session.count))} 个其他词`:'本轮完成';
  $('undo-review').hidden=false;$('undo-review').disabled=!cardMode||!reviewHistory.length;
  document.querySelectorAll('[data-grade]').forEach(b=>b.disabled=!cardMode||!w);
  document.querySelector('[data-grade=good]').textContent=flipped?'下一词':'记得';document.querySelector('[data-grade=again]').textContent=flipped?'记错了':'不记得';
- if(preview){groupRows(todayWords(),$('today-list'));return;}if(library)return;
+ if(preview){groupRows(todayWords(),$('today-list'));return;}if(speaking){renderSpeaking();return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
  if(!w){content.append(element('div','card-definition',direction==='review'&&waiting.length?'等待重现':'本轮完成'));return;}
  content.append(element('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition));
@@ -109,7 +113,7 @@ function renderCard(){
 function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const filtered=words.filter(w=>[w.word,w.definition,groupName(w)].join(' ').toLocaleLowerCase().includes(query));$('shown').textContent=filtered.length+' 词';groupRows(filtered,$('list'),true);}
 function render(){todayWords();$('total').textContent=words.length;$('due-count').textContent=queueWords().length;$('learned').textContent=words.filter(w=>w.mastered).length;renderCard();renderList();}
 function setDirection(value){clearUndoFeedback();direction=value;flipped=false;pendingGrade=null;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
-$('en-zh').onclick=()=>setDirection('en-zh');$('zh-en').onclick=()=>setDirection('zh-en');$('tab-review').onclick=()=>setDirection('review');$('tab-library').onclick=()=>setDirection('library');
+$('en-zh').onclick=()=>setDirection('en-zh');$('zh-en').onclick=()=>setDirection('zh-en');$('tab-review').onclick=()=>setDirection('review');$('tab-library').onclick=()=>setDirection('library');$('tab-speaking').onclick=()=>setDirection('speaking');
 
 function normalizeSchedule(w){if(w.scheduleVersion===2)return;w.stage=[0,1,2,4,4,6,8,9][Math.min(7,w.stage)];w.scheduleVersion=2;}
 function advanceNormal(w){if(w.stage>=INTERVALS.length){w.mastered=true;w.due=0;return;}w.due=calendarDays(Date.now(),INTERVALS[w.stage]);w.stage++;}
@@ -243,8 +247,64 @@ $('backup-merge').onclick=()=>{
 };
 
 $('add-form').addEventListener('submit',e=>{e.preventDefault();const word=$('word').value.trim(),definition=$('definition').value.trim();if(!word||!definition)return;if(words.some(w=>w.word.toLocaleLowerCase()===word.toLocaleLowerCase())){toast('单词已存在');return;}const w=newWord(word,definition,[...new Set($('tags').value.split(',').map(t=>t.trim()).filter(Boolean))].slice(0,20));w.examples=$('examples').value.split('\n').map(t=>t.trim()).filter(Boolean).slice(0,10);w.dictionarySource=lookupSource;words.push(w);save();e.target.reset();clearLookup();render();$('single-dialog').close();});
+
+const SPEAKING_KEY='wordwell.speaking.v1';
+let speakingItems=[],speakingStorageOK=true;
+const initialSpeaking={id:'part1-opportunity-example',topic:'opportunity',question:'Did you have any opportunities to take part in new activities as a child?',answer:'To be honest, I didn’t have many opportunities to try new activities growing up. I came from a small town where access to things like music lessons or organized sports was pretty limited. Between schoolwork and helping my family with daily chores, there just wasn’t much room for extracurriculars. Looking back, I do wish I’d had more exposure to creative or physical activities—they really help shape your personality and build essential life skills.'};
+function validSpeaking(entry){return entry&&typeof entry.topic==='string'&&entry.topic.trim().length>0&&entry.topic.length<=120&&typeof entry.question==='string'&&entry.question.trim().length>0&&entry.question.length<=2000&&typeof entry.answer==='string'&&entry.answer.trim().length>0&&entry.answer.length<=20000;}
+function readSpeaking(){
+ try{const raw=localStorage.getItem(SPEAKING_KEY);if(raw===null){speakingItems=[{...initialSpeaking}];speakingStorageOK=true;saveSpeaking();return;}
+ const data=JSON.parse(raw);if(!Array.isArray(data)||!data.every(e=>validSpeaking(e)&&typeof e.id==='string'&&e.id.length>0)||new Set(data.map(e=>e.id)).size!==data.length)throw Error();speakingItems=data;speakingStorageOK=true;
+ }catch(e){speakingStorageOK=false;warn('口语库读取失败，原数据未覆盖。');}
+}
+function saveSpeaking(){return speakingStorageOK&&persist(SPEAKING_KEY,speakingItems);}
+function renderSpeaking(){
+ const query=$('speaking-search').value.trim().toLocaleLowerCase(),list=$('speaking-list');list.replaceChildren();
+ const matches=speakingItems.filter(e=>[e.topic,e.question,e.answer].join(' ').toLocaleLowerCase().includes(query));
+ if(!matches.length){list.append(element('div','empty','暂无题目'));return;}
+ for(const entry of matches){const box=element('article','speaking-entry'),header=element('div','speaking-topic-line'),body=element('div','speaking-body');
+ header.append(element('div','speaking-topic-title','题型：'+entry.topic));
+ const del=element('button','','×');del.type='button';del.setAttribute('aria-label','删除口语题 '+entry.question);del.onclick=()=>{if(confirm('删除这道口语题？')){speakingItems=speakingItems.filter(e=>e.id!==entry.id);const saved=saveSpeaking();renderSpeaking();$('review-count').textContent=speakingItems.length+' 题';toast(saved?'已删除':'删除仅在本次会话生效');}};
+ header.append(del);body.append(element('h3','speaking-question',entry.question),element('p','speaking-answer',entry.answer));box.append(header,body);list.append(box);
+ }
+}
+function speakingImportMode(text){$('speaking-form').hidden=text;$('speaking-batch').hidden=!text;$('speaking-manual-tab').setAttribute('aria-pressed',String(!text));$('speaking-text-tab').setAttribute('aria-pressed',String(text));$('speaking-status').textContent='';}
+$('speaking-import').onclick=()=>{$('speaking-dialog').showModal();};
+$('speaking-close').onclick=()=>$('speaking-dialog').close();
+$('speaking-manual-tab').onclick=()=>speakingImportMode(false);$('speaking-text-tab').onclick=()=>speakingImportMode(true);
+$('speaking-search').oninput=renderSpeaking;
+function importSpeaking(entries){
+ if(!Array.isArray(entries)||!entries.length||!entries.every(validSpeaking))throw Error('每条口语需包含完整的题型、问题和答案。');
+ const key=e=>e.topic.trim().toLocaleLowerCase()+'\n'+e.question.trim().toLocaleLowerCase(),known=new Set(speakingItems.map(key)),ids=new Set(speakingItems.map(e=>e.id));let count=0;
+ for(const source of entries){const entry={topic:source.topic.trim(),question:source.question.trim(),answer:source.answer.trim()};if(known.has(key(entry)))continue;
+ entry.id=typeof source.id==='string'&&source.id.length>0&&!ids.has(source.id)?source.id:crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2);ids.add(entry.id);known.add(key(entry));speakingItems.push(entry);count++;}
+ const saved=saveSpeaking();renderSpeaking();if(direction==='speaking')$('review-count').textContent=speakingItems.length+' 题';
+ const message=`已导入 ${count} 题，跳过 ${entries.length-count} 题`+(saved?'':'（仅本次会话，请导出口语备份）');$('speaking-status').textContent=message;toast(message);return saved;
+}
+$('speaking-form').onsubmit=e=>{e.preventDefault();try{const saved=importSpeaking([{topic:$('speaking-topic').value,question:$('speaking-question').value,answer:$('speaking-answer').value}]);if(saved){e.target.reset();$('speaking-dialog').close();}}catch(error){$('speaking-status').textContent=error.message;}};
+function parseSpeaking(text){
+ if(new Blob([text]).size>5*1024*1024)throw Error('口语内容超过 5 MB');
+ const raw=text.trim();if(!raw)throw Error('内容为空');
+ if(/^[\[{]/.test(raw)){let data;try{data=JSON.parse(raw);}catch(e){throw Error('JSON 格式错误');}if(Array.isArray(data))return data;if(data&&data.version===1&&Array.isArray(data.speaking))return data.speaking;if(validSpeaking(data))return [data];throw Error('不是有效的口语内容');}
+ const result=[];let topic='',question='',answer='',field='';
+ const flush=()=>{if(question||answer){result.push({topic,question:question.trim(),answer:answer.trim()});question='';answer='';}};
+ for(const line of raw.split(/\r?\n/)){let match;
+ if((match=line.match(/^\s*(?:题型|话题|topic|category)\s*[:：]\s*(.*)$/i))){flush();topic=match[1].trim();field='topic';}
+ else if((match=line.match(/^\s*(?:问题|question)\s*[:：]\s*(.*)$/i))||(match=line.match(/^\s*#{1,6}\s+(.+)$/))){flush();question=match[1].trim();field='question';}
+ else if((match=line.match(/^\s*(?:回答|答案|answer)\s*[:：]\s*(.*)$/i))){answer=match[1].trim();field='answer';}
+ else if(field==='answer')answer+='\n'+line;
+ else if(field==='question'&&line.trim())question+=' '+line.trim();
+ else if(!field&&line.trim())throw Error('请提供题型、问题和答案');
+ }
+ flush();if(!result.length)throw Error('未识别到口语题');return result;
+}
+$('speaking-batch-save').onclick=()=>{try{importSpeaking(parseSpeaking($('speaking-text').value));}catch(error){$('speaking-status').textContent=error.message;}};
+$('speaking-file').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>5*1024*1024)throw Error('口语文件超过 5 MB');$('speaking-text').value=await file.text();$('speaking-status').textContent='文件已读取';}catch(error){$('speaking-status').textContent=error.message;}finally{e.target.value='';}};
+$('speaking-export').onclick=()=>download(JSON.stringify({version:1,speaking:speakingItems},null,2),'application/json','wordwell-part1-backup.json');
+window.addEventListener('storage',e=>{if(e.key===SPEAKING_KEY||e.key===null){readSpeaking();renderSpeaking();if(direction==='speaking')$('review-count').textContent=speakingItems.length+' 题';}});
+
 window.addEventListener('storage',e=>{if([KEY,PLAN_KEY,SESSION_KEY,'wordwell.daily-limit',null].includes(e.key)){dailyPlan=null;session=null;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit)){dailyLimit=limit;$('daily-limit').value=String(limit);}}catch(e){}read();render();}});
-function refresh(){read();render();}
+function refresh(){readSpeaking();read();render();}
 window.addEventListener('pageshow',refresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});setInterval(render,60000);
-read();render();
+readSpeaking();read();render();
 </script></body></html>
