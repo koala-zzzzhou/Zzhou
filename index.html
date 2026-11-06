@@ -11,6 +11,8 @@
 @media(max-width:640px){.direction-switch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%}.direction-switch button{min-width:0;padding:10px 2px;font-size:12px}.plan-tools{gap:8px}.layout:not(.is-list) #undo-review{grid-row:1} .plan-tools label{font-size:11px}}
 
 .card{cursor:default;border-radius:9px}#ratings button[data-grade="good"]{background:var(--lime);border-color:var(--lime)}#ratings button[data-grade="again"]{background:#fffefa;border-color:var(--line)}
+
+#undo-review.undo-done{background:var(--green);border-color:var(--green);color:white;opacity:1;font-size:15px}#toast.undo-toast{top:50%;bottom:auto;transform:translate(-50%,-50%);font-size:18px;padding:16px 26px;box-shadow:0 8px 35px #18302533;pointer-events:none}
 </style></head><body>
 <header><div class="brand">wordwell</div><div class="metrics"><span><strong id="total">0</strong>词库</span><span><strong id="due-count">0</strong>待复习</span><span><strong id="learned">0</strong>熟记</span></div></header>
 <main><div id="storage-warning" class="notice" role="alert" hidden></div>
@@ -26,7 +28,7 @@
 const KEY='wordwell.v1',DAY=86400000,INTERVALS=[1,2,4,7,15,30,60,90,180],PLAN_KEY='wordwell.daily-plan.v1',SESSION_KEY='wordwell.review-session.v2';
 const $=id=>document.getElementById(id),clone=value=>JSON.parse(JSON.stringify(value));
 let words=[],currentId=null,flipped=false,storageOK=true,toastTimer,backupURL=null,direction='en-zh',dailyPlan=null,session=null;
-let pendingGrade=null;
+let pendingGrade=null,undoFeedbackTimer;
 const reviewHistory=[];let dailyLimit=100;try{const limit=Number(localStorage.getItem('wordwell.daily-limit'));if([100,120,140].includes(limit))dailyLimit=limit;}catch(e){}
 $('daily-limit').value=String(dailyLimit);
 $('daily-limit').onchange=()=>{const value=Number($('daily-limit').value);if(![100,120,140].includes(value))return;dailyLimit=value;persist('wordwell.daily-limit',dailyLimit);currentId=null;flipped=false;pendingGrade=null;render();};
@@ -37,7 +39,9 @@ function calendarDays(time,days){const d=new Date(time);d.setDate(d.getDate()+da
 function element(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;}
 function valid(w){return w&&typeof w.id==='string'&&w.id.length>0&&typeof w.word==='string'&&w.word.trim().length>0&&w.word.length<=120&&typeof w.definition==='string'&&w.definition.trim().length>0&&w.definition.length<=2000&&Array.isArray(w.tags)&&w.tags.length<=20&&w.tags.every(t=>typeof t==='string'&&t.length<=200)&&Number.isInteger(w.stage)&&w.stage>=0&&w.stage<=9&&Number.isFinite(w.due)&&w.due>=0&&Number.isFinite(w.created)&&w.created>=0&&(w.examples===undefined||(Array.isArray(w.examples)&&w.examples.length<=10&&w.examples.every(t=>typeof t==='string'&&t.length<=4000)))&&(w.mastered===undefined||typeof w.mastered==='boolean')&&(w.reinforcement===undefined||w.reinforcement===null||(Number.isFinite(w.reinforcement.anchor)&&w.reinforcement.anchor>=0&&Number.isInteger(w.reinforcement.step)&&w.reinforcement.step>=0&&w.reinforcement.step<=2));}
 function warn(text){$('storage-warning').hidden=false;$('storage-warning').textContent=text;}
-function toast(text){$('toast').textContent=text;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').textContent='',3500);}
+function toast(text,duration=3500,kind=''){const box=$('toast');box.textContent=text;box.classList.toggle('undo-toast',kind==='undo');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{box.textContent='';box.classList.remove('undo-toast');},duration);}
+function clearUndoFeedback(){clearTimeout(undoFeedbackTimer);$('undo-review').classList.remove('undo-done');$('undo-review').textContent='↶';}
+function showUndoFeedback(saved){clearUndoFeedback();$('undo-review').classList.add('undo-done');$('undo-review').textContent='✓ 已撤销';toast(saved?'✓ 已撤销':'已撤销，保存失败，请导出备份',saved?2000:5000,'undo');undoFeedbackTimer=setTimeout(clearUndoFeedback,2000);}
 function persist(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch(e){warn('保存失败，请导出备份。');return false;}}
 function save(){return storageOK&&persist(KEY,words);}
 function read(){try{const raw=localStorage.getItem(KEY),data=JSON.parse(raw===null?$('offline-seed').textContent:raw);if(!Array.isArray(data)||!data.every(valid)||new Set(data.map(w=>w.id)).size!==data.length)throw Error();words=data;}catch(e){storageOK=false;warn('无法读取存储，原数据未覆盖。');}}
@@ -104,7 +108,7 @@ function renderCard(){
 }
 function renderList(){const query=$('search').value.trim().toLocaleLowerCase();const filtered=words.filter(w=>[w.word,w.definition,groupName(w)].join(' ').toLocaleLowerCase().includes(query));$('shown').textContent=filtered.length+' 词';groupRows(filtered,$('list'),true);}
 function render(){todayWords();$('total').textContent=words.length;$('due-count').textContent=queueWords().length;$('learned').textContent=words.filter(w=>w.mastered).length;renderCard();renderList();}
-function setDirection(value){direction=value;flipped=false;pendingGrade=null;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
+function setDirection(value){clearUndoFeedback();direction=value;flipped=false;pendingGrade=null;try{localStorage.setItem('wordwell.module',value);}catch(e){}renderCard();}
 $('en-zh').onclick=()=>setDirection('en-zh');$('zh-en').onclick=()=>setDirection('zh-en');$('tab-review').onclick=()=>setDirection('review');$('tab-library').onclick=()=>setDirection('library');
 
 function normalizeSchedule(w){if(w.scheduleVersion===2)return;w.stage=[0,1,2,4,4,6,8,9][Math.min(7,w.stage)];w.scheduleVersion=2;}
@@ -126,13 +130,13 @@ function gradeWord(grade){
 }
 document.querySelectorAll('[data-grade]').forEach(b=>b.onclick=()=>{
  if(!['zh-en','review'].includes(direction)||!visibleQueue().some(w=>w.id===currentId))return;
- if(!flipped){pendingGrade=b.dataset.grade;flipped=true;renderCard();return;}
+ clearUndoFeedback();if(!flipped){pendingGrade=b.dataset.grade;flipped=true;renderCard();return;}
  gradeWord(b.dataset.grade==='again'?'again':pendingGrade||'again');
 });
 $('undo-review').onclick=()=>{
  ensureDay();const prev=reviewHistory.pop();if(!prev)return;const i=words.findIndex(w=>w.id===prev.before.id);
  if(i<0||JSON.stringify(words[i])!==prev.after){render();toast('词条已变更，未覆盖');return;}
- words[i]=prev.before;session=prev.session;direction=studied(prev.before)?'review':'zh-en';try{localStorage.setItem('wordwell.module',direction);}catch(e){}save();persist(SESSION_KEY,session);currentId=prev.before.id;flipped=false;pendingGrade=null;render();
+ words[i]=prev.before;session=prev.session;direction=studied(prev.before)?'review':'zh-en';try{localStorage.setItem('wordwell.module',direction);}catch(e){}const saved=save(),sessionSaved=persist(SESSION_KEY,session);currentId=prev.before.id;flipped=false;pendingGrade=null;render();showUndoFeedback(saved&&sessionSaved);
 };
 $('search').oninput=renderList;
 $('single-import').onclick=()=>$('single-dialog').showModal();$('single-close').onclick=()=>$('single-dialog').close();
