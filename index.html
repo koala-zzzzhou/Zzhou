@@ -92,9 +92,13 @@ function groupRows(items,target,actions=false){
   }target.append(box);
  }
 }
+function retryModule(p){
+ if(['zh-en','review'].includes(p.module))return p.module;
+ const w=words.find(item=>item.id===p.id);return w&&w.stage>0?'review':'zh-en';
+}
 function visibleQueue(){
- const queue=queueWords(),pendingIds=new Set(session.pending.map(p=>p.id)),readyIds=new Set(session.pending.filter(p=>p.readyAt<=session.count).map(p=>p.id));
- return queue.filter(w=>direction==='zh-en'?(!studied(w)||readyIds.has(w.id)):direction==='review'?(studied(w)&&!pendingIds.has(w.id)):true);
+ const queue=queueWords(),pending=new Map(session.pending.map(p=>[p.id,p]));
+ return queue.filter(w=>{const retry=pending.get(w.id);if(retry)return !['zh-en','review'].includes(direction)||retryModule(retry)===direction;return direction==='zh-en'?!studied(w):direction==='review'?studied(w):true;});
 }
 function renderCard(){
  const queue=visibleQueue(),preview=direction==='en-zh',library=direction==='library',speaking=direction==='speaking',cardMode=!preview&&!library&&!speaking;
@@ -104,13 +108,13 @@ function renderCard(){
  const layout=document.querySelector('.layout');layout.classList.toggle('is-preview',preview);layout.classList.toggle('is-list',!cardMode);
  let w=queue.find(w=>w.id===currentId);if(!w){w=queue[0];currentId=w?.id||null;flipped=false;pendingGrade=null;}
  $('review-count').textContent=speaking?speakingItems.length+' 题':library?words.length+' 词':`${session.completedIds.length} / ${dailyLimit}`;
- const held=session.pending.filter(p=>words.some(w=>w.id===p.id)),waiting=held.filter(p=>p.readyAt>session.count);
+ const held=session.pending.filter(p=>words.some(w=>w.id===p.id)&&retryModule(p)===direction),waiting=held.filter(p=>p.readyAt>session.count);
  $('undo-review').hidden=false;$('undo-review').disabled=!cardMode||!reviewHistory.length;
  document.querySelectorAll('[data-grade]').forEach(b=>b.disabled=!cardMode||!w);
  document.querySelector('[data-grade=good]').textContent=flipped?'下一词':'记得';document.querySelector('[data-grade=again]').textContent=flipped?'记错了':'不记得';
  if(preview){groupRows(todayWords(),$('today-list'));return;}if(speaking){renderSpeaking();return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
- if(!w){content.append(element('div','card-definition',direction==='zh-en'&&waiting.length?'等待重现':'本轮完成'));return;}
+ if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':'本轮完成'));return;}
  content.append(element('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition));
  if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach(t=>ex.append(element('div','',t)));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
  $('card').setAttribute('aria-label',flipped?'英文答案':'中文题面');
@@ -128,7 +132,7 @@ function gradeWord(grade){
  normalizeSchedule(w);w.lastReviewedAt=Date.now();w.lastReviewedDay=localDay();w.reviewCount=(Number(w.reviewCount)||0)+1;w.mastered=false;session.count++;if(!session.completedIds.includes(w.id))session.completedIds.push(w.id);session.pending=session.pending.filter(p=>p.id!==w.id);
  if(grade==='again'){
   w.reinforcement={anchor:midnight(),step:0};w.due=calendarDays(w.reinforcement.anchor,1);
-  session.pending.push({id:w.id,readyAt:session.count+10});
+  session.pending.push({id:w.id,readyAt:session.count+10,module:direction});
  }else if(!repeat){
   if(w.reinforcement){
    if(w.reinforcement.step<2){w.reinforcement.step++;w.due=calendarDays(w.reinforcement.anchor,[1,3,5][w.reinforcement.step]);}
