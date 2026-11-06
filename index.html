@@ -93,8 +93,8 @@ function groupRows(items,target,actions=false){
  }
 }
 function visibleQueue(){
- const queue=queueWords(),readyIds=new Set(session.pending.filter(p=>p.readyAt<=session.count).map(p=>p.id));
- return queue.filter(w=>direction==='zh-en'?(!studied(w)||readyIds.has(w.id)):direction==='review'?studied(w):true);
+ const queue=queueWords(),pendingIds=new Set(session.pending.map(p=>p.id)),readyIds=new Set(session.pending.filter(p=>p.readyAt<=session.count).map(p=>p.id));
+ return queue.filter(w=>direction==='zh-en'?(!studied(w)||readyIds.has(w.id)):direction==='review'?(studied(w)&&!pendingIds.has(w.id)):true);
 }
 function renderCard(){
  const queue=visibleQueue(),preview=direction==='en-zh',library=direction==='library',speaking=direction==='speaking',cardMode=!preview&&!library&&!speaking;
@@ -110,7 +110,7 @@ function renderCard(){
  document.querySelector('[data-grade=good]').textContent=flipped?'下一词':'记得';document.querySelector('[data-grade=again]').textContent=flipped?'记错了':'不记得';
  if(preview){groupRows(todayWords(),$('today-list'));return;}if(speaking){renderSpeaking();return;}if(library)return;
  const content=$('card-content');content.replaceChildren();$('card').disabled=!w;
- if(!w){content.append(element('div','card-definition',waiting.length?'等待重现':'本轮完成'));return;}
+ if(!w){content.append(element('div','card-definition',direction==='zh-en'&&waiting.length?'等待重现':'本轮完成'));return;}
  content.append(element('div',flipped?'card-word':'card-definition',flipped?w.word:w.definition));
  if(flipped&&w.examples?.length){const ex=element('div','examples');w.examples.forEach(t=>ex.append(element('div','',t)));if(w.dictionarySource)ex.append(dictionaryCredit(w.word));content.append(ex);}
  $('card').setAttribute('aria-label',flipped?'英文答案':'中文题面');
